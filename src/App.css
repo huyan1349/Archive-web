@@ -151,6 +151,20 @@
   transform: translateY(-1px);
 }
 
+.brand-word {
+  position: relative;
+  top: -1px;
+  font-family: var(--brand-serif);
+  font-size: clamp(22px, 2.3vw, 34px);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+  text-transform: none;
+  font-feature-settings:
+    'liga' 1,
+    'kern' 1;
+}
+
 .brand-mark {
   display: grid;
   width: 38px;
@@ -168,40 +182,12 @@
   overflow: visible;
 }
 
-.mark-field,
-.mark-spine,
-.mark-base {
-  fill: none;
-  stroke: var(--ink);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.mark-field {
-  stroke-width: 2.1;
-  opacity: 0.86;
-}
-
-.mark-spine {
-  stroke-width: 1.35;
-  opacity: 0.38;
-}
-
-.mark-base {
-  stroke-width: 2.1;
-}
-
-.mark-light {
-  fill: var(--rust);
-  opacity: 0.95;
-}
-
-.mark-dot {
-  fill: var(--ochre);
+.mark-fill {
+  fill: currentColor;
 }
 
 .brand:hover .brand-mark {
-  filter: drop-shadow(0 6px 8px rgba(159, 79, 45, 0.18));
+  filter: drop-shadow(0 5px 7px rgba(35, 27, 19, 0.14));
   transform: translateY(-1px) scale(1.06);
 }
 

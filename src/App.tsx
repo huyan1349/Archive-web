@@ -269,14 +269,10 @@ function App() {
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" role="img">
-              <path className="mark-field" d="M10 38.5V16.8c0-4.3 3.5-7.8 7.8-7.8h12.4c4.3 0 7.8 3.5 7.8 7.8v21.7" />
-              <path className="mark-spine" d="M16 38.5V18.2c0-2.4 1.9-4.3 4.3-4.3h7.4c2.4 0 4.3 1.9 4.3 4.3v20.3" />
-              <path className="mark-light" d="M24 30.8c3.4-3.9 3.4-7.7 0-11.6-3.4 3.9-3.4 7.7 0 11.6Z" />
-              <path className="mark-base" d="M14 38.5h20" />
-              <circle className="mark-dot" cx="24" cy="38.5" r="2.2" />
+              <path className="mark-fill" d="M10 40V18.2C10 11.5 15.5 6 22.2 6h3.6C32.5 6 38 11.5 38 18.2V40H10Z" />
             </svg>
           </span>
-          <span>Archive</span>
+          <span className="brand-word">Archive</span>
         </div>
         <nav className="nav-links" aria-label="Primary navigation">
           {[
