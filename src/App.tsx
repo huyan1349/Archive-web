@@ -124,6 +124,7 @@ function byRecent(a: Fragment, b: Fragment): number {
 function App() {
   const [lang, setLang] = useState<Lang>('zh')
   const [page, setPage] = useState<Page>('room')
+  const [showIntro, setShowIntro] = useState(() => localStorage.getItem('archive:intro-seen') !== '1')
   const [books, setBooks] = useState<Book[]>([])
   const [archiveFragments, setArchiveFragments] = useState<Fragment[]>([])
   const [imports, setImports] = useState<ImportRecord[]>([])
@@ -258,84 +259,158 @@ function App() {
     setPage(nextPage)
   }
 
+  function enterArchive() {
+    localStorage.setItem('archive:intro-seen', '1')
+    setShowIntro(false)
+  }
+
   const selectedBookFragments = selectedBook
     ? sortedFragments.filter((fragment) => fragment.bookId === selectedBook.id)
     : []
+  const recentFragments = sortedFragments.slice(0, 8)
+  const workspaceFragments = sortedFragments.slice(0, 14)
+  const selectedFragment = featuredFragment ?? sortedFragments[0]
+  const selectedFragmentBook = selectedFragment ? bookMap.get(selectedFragment.bookId) : null
+  const selectedBookSummary = selectedBook
+    ? bookSummaries.find(({ book }) => book.id === selectedBook.id)
+    : null
+  const pageTitle = {
+    room: lang === 'zh' ? '今日档案台' : 'Today desk',
+    fragments: t.allFragments,
+    timeline: t.timelineTitle,
+    library: t.libraryTitle,
+    book: selectedBook?.title ?? t.bookRoomLabel,
+  }[page]
+  const pageNote = {
+    room: lang === 'zh'
+      ? '最近的阅读痕迹、导入状态和需要回看的句子集中在这里。'
+      : 'Recent traces, import status, and fragments worth returning to live here.',
+    fragments: lang === 'zh'
+      ? '按时间排开的片段记录流，适合快速回看和进入单本书。'
+      : 'A chronological record stream for review and book-level entry.',
+    timeline: lang === 'zh'
+      ? '把阅读按照月份折叠成一条安静的回望线。'
+      : 'Reading folded into a quiet monthly retrospective.',
+    library: lang === 'zh'
+      ? '从书开始整理，而不是从功能开始整理。'
+      : 'Organize from books, not from features.',
+    book: lang === 'zh'
+      ? '单本书的阅读房间，只保留与这本书有关的痕迹。'
+      : 'A single-book room for traces belonging to this title.',
+  }[page]
+  const navigationItems = [
+    ['room', t.navRoom, stats.fragments],
+    ['fragments', t.navFragments, stats.highlights],
+    ['library', t.navLibrary, stats.books],
+    ['timeline', t.navTimeline, timelineGroups.length],
+  ] as const
 
   return (
     <main className={`archive is-${lang}`}>
       <div className="paper-noise" />
-      <header className="archive-topbar">
-        <div className="brand">
-          <span className="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 48 48" role="img">
-              <path
-                className="mark-fill"
-                fillRule="evenodd"
-                d="M14 8h18c3.3 0 6 2.7 6 6v25H16.5A6.5 6.5 0 0 1 10 32.5V12a4 4 0 0 1 4-4Zm4 5.5v18.8c0 1.2 1 2.2 2.2 2.2H32V13.5H18Zm3.5 4a1.5 1.5 0 0 1 3 0v13a1.5 1.5 0 0 1-3 0v-13Zm-4.5 18.8a1.2 1.2 0 0 0 0 2.4h17a1.2 1.2 0 0 0 0-2.4H17Z"
-              />
-            </svg>
-          </span>
-          <span className="brand-word">Archive</span>
-        </div>
-        <nav className="nav-links" aria-label="Primary navigation">
-          {[
-            ['room', t.navRoom],
-            ['fragments', t.navFragments],
-            ['timeline', t.navTimeline],
-            ['library', t.navLibrary],
-          ].map(([id, label]) => (
+      {showIntro && (
+        <section className="intro-screen" aria-label="Archive introduction">
+          <div className="intro-rule top-rule" />
+          <div className="intro-hero">
+            <div>
+              <p className="eyebrow">{t.eyebrow}</p>
+              <h1>{t.heroTitle}</h1>
+              <p className="intro">{t.intro}</p>
+              <div className="intro-actions">
+                <button type="button" onClick={enterArchive}>
+                  {lang === 'zh' ? '进入档案' : 'Enter archive'}
+                </button>
+                <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
+                  {lang === 'zh' ? 'English' : '中文'}
+                </button>
+              </div>
+            </div>
+
+            <article className="room-card intro-card" aria-label="Opening fragment">
+              <div className="ink-figure" />
+              <p className="card-kicker">{t.cardKicker}</p>
+              <blockquote>{featuredFragment?.content || t.emptyQuote}</blockquote>
+              <div className="card-footer">
+                <span>{stats.fragments} {t.returned}</span>
+                <span>{featuredFragment ? formatDate(featuredFragment.clippedAt, lang) : '00:17'}</span>
+              </div>
+            </article>
+          </div>
+          <div className="poster-caption intro-caption">
+            <span>{t.captionOne}</span>
+            <span>{t.captionTwo}</span>
+            <span>{t.captionThree}</span>
+          </div>
+          <div className="intro-rule bottom-rule" />
+        </section>
+      )}
+      <div className="app-shell">
+        <aside className="app-sidebar" aria-label="Archive controls">
+          <div className="brand">
+            <span className="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 48 48" role="img">
+                <path
+                  className="mark-fill"
+                  fillRule="evenodd"
+                  d="M14 8h18c3.3 0 6 2.7 6 6v25H16.5A6.5 6.5 0 0 1 10 32.5V12a4 4 0 0 1 4-4Zm4 5.5v18.8c0 1.2 1 2.2 2.2 2.2H32V13.5H18Zm3.5 4a1.5 1.5 0 0 1 3 0v13a1.5 1.5 0 0 1-3 0v-13Zm-4.5 18.8a1.2 1.2 0 0 0 0 2.4h17a1.2 1.2 0 0 0 0-2.4H17Z"
+                />
+              </svg>
+            </span>
+            <span className="brand-word">Archive</span>
+          </div>
+
+          <nav className="app-nav" aria-label="Primary navigation">
+            {navigationItems.map(([id, label, count]) => (
+              <button
+                type="button"
+                className={page === id ? 'nav-tab active' : 'nav-tab'}
+                onClick={() => changePage(id as Page)}
+                key={id}
+              >
+                <i className={`page-icon icon-${id}`} aria-hidden="true" />
+                <span>{label}</span>
+                <small>{count}</small>
+              </button>
+            ))}
+          </nav>
+
+          <div className="side-actions">
+            <button type="button" onClick={handleDemoImport}>{t.import}</button>
+            <button type="button" className="secondary-action" onClick={() => fileInputRef.current?.click()}>
+              {t.importMine}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt,text/plain"
+              hidden
+              onChange={(event) => {
+                const file = event.target.files?.[0]
+                if (file) void handleFileImport(file)
+                event.target.value = ''
+              }}
+            />
             <button
               type="button"
-              className={page === id ? 'nav-tab active' : 'nav-tab'}
-              onClick={() => changePage(id as Page)}
-              key={id}
+              className="language-toggle"
+              onClick={() => setLang(nextLang)}
+              aria-label={lang === 'zh' ? 'Switch to English' : '切换到中文'}
             >
-              {label}
+              {lang === 'zh' ? '中文 / EN' : 'EN / 中文'}
             </button>
-          ))}
-          <button
-            type="button"
-            className="language-toggle"
-            onClick={() => setLang(nextLang)}
-            aria-label={lang === 'zh' ? 'Switch to English' : '切换到中文'}
-          >
-            {lang === 'zh' ? '中文 / EN' : 'EN / 中文'}
-          </button>
-        </nav>
-      </header>
+          </div>
 
-      {page === 'room' && (
-      <section className="poster home-poster">
-        <div className="poster-rule top-rule" />
-        <div className="hero-grid" id="room">
-          <div className="hero-copy">
-            <p className="eyebrow">{t.eyebrow}</p>
-            <h1>
-              {t.heroTitle}
-            </h1>
-            <p className="intro">
-              {t.intro}
-            </p>
-            <div className="hero-actions">
-              <button type="button" onClick={handleDemoImport}>{t.import}</button>
-              <button type="button" className="secondary-action" onClick={() => fileInputRef.current?.click()}>
-                {t.importMine}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".txt,text/plain"
-                hidden
-                onChange={(event) => {
-                  const file = event.target.files?.[0]
-                  if (file) void handleFileImport(file)
-                  event.target.value = ''
-                }}
-              />
-              <span>{status}</span>
+          <p className="import-status">{status}</p>
+        </aside>
+
+        <section className="app-workspace" data-page-title={pageTitle}>
+          <header className="workspace-header">
+            <div>
+              <p className="eyebrow">{t.eyebrow}</p>
+              <h1>{pageTitle}</h1>
+              <p>{pageNote}</p>
             </div>
-            <div className="archive-ledger">
+            <div className="archive-ledger compact">
               <div>
                 <strong>{stats.books}</strong>
                 <span>{t.books}</span>
@@ -345,148 +420,163 @@ function App() {
                 <span>{t.fragments}</span>
               </div>
               <div>
-                <strong>{stats.highlights}</strong>
-                <span>{t.highlights}</span>
-              </div>
-              <div>
                 <strong>{stats.notes}</strong>
                 <span>{t.notes}</span>
               </div>
             </div>
-          </div>
+          </header>
 
-          <div className="room-card" aria-label="Featured reading fragment">
-            <div className="ink-figure" />
-            <p className="card-kicker">{t.cardKicker}</p>
-            <blockquote>
-              {featuredFragment?.content || t.emptyQuote}
-            </blockquote>
-            <div className="card-footer">
-              <span>{stats.fragments} {t.returned}</span>
-              <span>{featuredFragment ? formatDate(featuredFragment.clippedAt, lang) : '00:17'}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="home-spread">
-          <aside className="reading-index-card">
-            <span>{lang === 'zh' ? '藏书索引' : 'Reading index'}</span>
-            {topBooks.map(({ book, count }, index) => (
-              <button type="button" key={book.id} onClick={() => openBookRoom(book.id)}>
-                <small>{String(index + 1).padStart(2, '0')}</small>
-                <strong>{book.title}</strong>
-                <em>{count} {t.fragments}</em>
-              </button>
-            ))}
-          </aside>
-
-          <article className="note-specimen">
-            <span>{lang === 'zh' ? '边注标本' : 'Marginal note'}</span>
-            <p>{latestNote?.content || t.emptyQuote}</p>
-            <small>{latestNote ? formatDate(latestNote.clippedAt, lang) : t.referenceFile}</small>
-          </article>
-
-          <div className="poster-caption">
-            <span>{t.captionOne}</span>
-            <span>{t.captionTwo}</span>
-            <span>{t.captionThree}</span>
-          </div>
-        </div>
-        <div className="poster-rule bottom-rule" />
-      </section>
-      )}
-
-      {page === 'fragments' && (
-      <section className="fragments" id="fragments">
-        <div className="section-heading">
-          <p>{t.fragmentsLabel}</p>
-          <h2>{t.allFragments}: {stats.fragments} {t.fragments}</h2>
-        </div>
-        <div className="fragment-grid expanded">
-          {sortedFragments.map((fragment, index) => {
-            const book = bookMap.get(fragment.bookId)
-            return (
-            <article className="fragment-card" key={fragment.id} style={{ '--tilt': `${(index % 5) - 2}deg` } as CSSProperties}>
-              <span>{typeLabel(fragment.type, lang)} / {formatDate(fragment.clippedAt, lang)}</span>
-              <p>{fragment.content || t.noContent}</p>
-              <footer>
-                <strong>{book?.title ?? t.source}</strong>
-                <small>{book?.author} / {fragment.location ? `Loc. ${fragment.location}` : `Page ${fragment.page ?? '-'}`}</small>
-              </footer>
+          <section className="workspace-context" aria-label="Archive context">
+            <article>
+              <span>{lang === 'zh' ? '当前片段' : 'Current fragment'}</span>
+              <p>{selectedFragment?.content || t.emptyQuote}</p>
+              <small>{selectedFragmentBook?.title ?? t.source}</small>
             </article>
-            )
-          })}
-        </div>
-      </section>
-      )}
-
-      {page === 'timeline' && (
-      <section className="timeline" id="timeline">
-        <div className="section-heading">
-          <p>{t.timelineLabel}</p>
-          <h2>{t.timelineTitle}</h2>
-        </div>
-        <div className="timeline-list">
-          {timelineGroups.map((item) => (
-            <article className="timeline-item" key={item.label}>
-              <span>{item.label}</span>
-              <h3>{Array.from(item.bookIds).map((id) => bookMap.get(id)?.title).filter(Boolean).join(' / ')}</h3>
-              <p>{item.fragments.length} {t.fragments}</p>
+            <article>
+              <span>{lang === 'zh' ? '当前书籍' : 'Current book'}</span>
+              <strong>{selectedBook?.title ?? t.libraryTitle}</strong>
+              <small>{selectedBook?.author ?? t.referenceFile} / {selectedBookSummary?.count ?? 0} {t.fragments}</small>
             </article>
-          ))}
-        </div>
-      </section>
-      )}
+            <article className="context-index">
+              <span>{lang === 'zh' ? '藏书索引' : 'Reading index'}</span>
+              <div>
+                {topBooks.map(({ book, count }, index) => (
+                  <button type="button" key={book.id} onClick={() => openBookRoom(book.id)}>
+                    <small>{String(index + 1).padStart(2, '0')}</small>
+                    <strong>{book.title}</strong>
+                    <em>{count}</em>
+                  </button>
+                ))}
+              </div>
+            </article>
+          </section>
 
-      {page === 'library' && (
-      <section className="library" id="library">
-        <div>
-          <p className="eyebrow">{t.libraryLabel}</p>
-          <h2>{t.libraryTitle}</h2>
-          {latestImport && (
-            <p className="library-note">
-              {t.latestImport}: {formatDate(latestImport.importedAt, lang)} / {latestImport.importedCount} {t.fragments}
-            </p>
-          )}
-        </div>
-        <div className="library-panel library-catalog">
-          {bookSummaries.map(({ book, count, latest, quote }, index) => (
-            <button type="button" onClick={() => openBookRoom(book.id)} key={book.id}>
-              <small className="catalog-number">{String(index + 1).padStart(2, '0')}</small>
-              <span>{book.title}</span>
-              <small>{book.author} / {count} {t.fragments} / {formatDate(latest, lang)}</small>
-              <em>{quote || t.noContent}</em>
-            </button>
-          ))}
-        </div>
-      </section>
-      )}
+          {page === 'room' && (
+            <section className="desk-grid">
+              <article className="today-card">
+                <span>{lang === 'zh' ? '今日状态' : 'Today'}</span>
+                <h2>{lang === 'zh' ? '阅读痕迹正在归档。' : 'Reading traces are being filed.'}</h2>
+                <p>{latestImport ? `${t.latestImport}: ${formatDate(latestImport.importedAt, lang)} / ${latestImport.importedCount} ${t.fragments}` : t.emptyQuote}</p>
+              </article>
 
-      {page === 'book' && selectedBook && (
-        <section className="book-room">
-          <div className="section-heading">
-            <p>{t.bookRoomLabel}</p>
-            <h2>{selectedBook.title}</h2>
-          </div>
-          <div className="book-room-layout">
-            <aside className="book-room-index">
-              <p>{selectedBook.author}</p>
-              <strong>{selectedBookFragments.length}</strong>
-              <span>{t.fragments}</span>
-              <button type="button" onClick={() => changePage('library')}>{t.navLibrary}</button>
-            </aside>
-            <div className="book-fragment-stack">
-              {selectedBookFragments.map((fragment) => (
-                <article className="book-fragment" key={fragment.id}>
-                  <span>{typeLabel(fragment.type, lang)} / {formatDate(fragment.clippedAt, lang)}</span>
-                  <p>{fragment.content || t.noContent}</p>
-                  <small>{fragment.location ? `Location ${fragment.location}` : `Page ${fragment.page ?? '-'}`}</small>
+              <div className="recent-stream">
+                <div className="panel-heading">
+                  <span>{lang === 'zh' ? '最近进入档案' : 'Recent entries'}</span>
+                  <button type="button" onClick={() => changePage('fragments')}>{t.allFragments}</button>
+                </div>
+                {recentFragments.map((fragment) => {
+                  const book = bookMap.get(fragment.bookId)
+                  return (
+                    <article className="record-row" key={fragment.id}>
+                      <time>{formatDate(fragment.clippedAt, lang)}</time>
+                      <p>{fragment.content || t.noContent}</p>
+                      <small>{book?.title ?? t.source} / {typeLabel(fragment.type, lang)}</small>
+                    </article>
+                  )
+                })}
+              </div>
+
+              <aside className="focus-stack">
+                <article className="room-card compact-card" aria-label="Featured reading fragment">
+                  <p className="card-kicker">{t.cardKicker}</p>
+                  <blockquote>{featuredFragment?.content || t.emptyQuote}</blockquote>
+                  <div className="card-footer">
+                    <span>{stats.fragments} {t.returned}</span>
+                    <span>{featuredFragment ? formatDate(featuredFragment.clippedAt, lang) : '00:17'}</span>
+                  </div>
                 </article>
-              ))}
-            </div>
-          </div>
+
+                <article className="note-specimen app-note">
+                  <span>{lang === 'zh' ? '边注标本' : 'Marginal note'}</span>
+                  <p>{latestNote?.content || t.emptyQuote}</p>
+                  <small>{latestNote ? formatDate(latestNote.clippedAt, lang) : t.referenceFile}</small>
+                </article>
+              </aside>
+            </section>
+          )}
+
+          {page === 'fragments' && (
+            <section className="records-layout" id="fragments">
+              <div className="record-filters" aria-label="Archive filters">
+                <span>{t.highlights}: {stats.highlights}</span>
+                <span>{t.notes}: {stats.notes}</span>
+                <span>{t.bookmarks}: {stats.bookmarks}</span>
+              </div>
+              <div className="record-stream">
+                {workspaceFragments.map((fragment, index) => {
+                  const book = bookMap.get(fragment.bookId)
+                  return (
+                    <article className="fragment-card record-card" key={fragment.id} style={{ '--tilt': `${(index % 5) - 2}deg` } as CSSProperties}>
+                      <span>{typeLabel(fragment.type, lang)} / {formatDate(fragment.clippedAt, lang)}</span>
+                      <p>{fragment.content || t.noContent}</p>
+                      <footer>
+                        <strong>{book?.title ?? t.source}</strong>
+                        <small>{book?.author} / {fragment.location ? `Loc. ${fragment.location}` : `Page ${fragment.page ?? '-'}`}</small>
+                      </footer>
+                    </article>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+
+          {page === 'timeline' && (
+            <section className="timeline app-timeline" id="timeline">
+              <div className="timeline-list">
+                {timelineGroups.map((item) => (
+                  <article className="timeline-item" key={item.label}>
+                    <span>{item.label}</span>
+                    <h3>{Array.from(item.bookIds).map((id) => bookMap.get(id)?.title).filter(Boolean).join(' / ')}</h3>
+                    <p>{item.fragments.length} {t.fragments}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {page === 'library' && (
+            <section className="library app-library" id="library">
+              <div className="library-panel library-catalog">
+                {bookSummaries.map(({ book, count, latest, quote }, index) => (
+                  <button
+                    type="button"
+                    className={selectedBook?.id === book.id ? 'selected' : ''}
+                    onClick={() => openBookRoom(book.id)}
+                    key={book.id}
+                  >
+                    <small className="catalog-number">{String(index + 1).padStart(2, '0')}</small>
+                    <span>{book.title}</span>
+                    <small>{book.author} / {count} {t.fragments} / {formatDate(latest, lang)}</small>
+                    <em>{quote || t.noContent}</em>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {page === 'book' && selectedBook && (
+            <section className="book-room app-book-room">
+              <div className="book-room-layout">
+                <aside className="book-room-index">
+                  <p>{selectedBook.author}</p>
+                  <strong>{selectedBookFragments.length}</strong>
+                  <span>{t.fragments}</span>
+                  <button type="button" onClick={() => changePage('library')}>{t.navLibrary}</button>
+                </aside>
+                <div className="book-fragment-stack">
+                  {selectedBookFragments.map((fragment) => (
+                    <article className="book-fragment" key={fragment.id}>
+                      <span>{typeLabel(fragment.type, lang)} / {formatDate(fragment.clippedAt, lang)}</span>
+                      <p>{fragment.content || t.noContent}</p>
+                      <small>{fragment.location ? `Location ${fragment.location}` : `Page ${fragment.page ?? '-'}`}</small>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
         </section>
-      )}
+      </div>
       <DevPanel />
     </main>
   )
