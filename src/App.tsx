@@ -131,22 +131,18 @@ const copy = {
     tutorialStartDesc4: '不上传任何内容。',
     wereadSection: '微信读书',
     wereadTitle: '微信读书 / WeRead',
-    wereadDesc: '一键同步微信读书的划线、笔记和书评。',
-    wereadCookieLabel: 'Cookie',
-    wereadCookieHint: '1. 打开 weread.qq.com 并扫码登录\n2. F12 → Application → Cookies → 复制全部\n3. 粘贴到下方，点击验证',
-    wereadValidate: '验证',
+    wereadDesc: '同步微信读书的划线、笔记和书评。',
+    wereadOpen: '打开微信读书',
+    wereadCookieLabel: '粘贴 Cookie',
     wereadSync: '一键同步',
-    wereadValid: 'Cookie 有效，可以同步',
-    wereadInvalid: 'Cookie 无效或已过期，请重新登录',
-    wereadSyncing: '正在同步...',
-    wereadSynced: '同步完成',
-    wereadProgress: '同步进度',
+    wereadSyncing: '同步中...',
+    wereadValid: 'Cookie 有效',
+    wereadInvalid: 'Cookie 无效，请重新登录',
     wereadBooks: '本书',
     wereadHighlights: '条划线',
     wereadNotes: '条笔记',
     wereadReviews: '条书评',
     wereadSkipped: '条重复跳过',
-    wereadErrors: '个错误',
   },
   en: {
     navRoom: 'The Room',
@@ -262,22 +258,18 @@ const copy = {
     tutorialStartDesc4: 'Nothing is uploaded anywhere.',
     wereadSection: 'WeRead',
     wereadTitle: 'WeRead Sync / 微信读书',
-    wereadDesc: 'One-click sync highlights, notes, and reviews from WeRead.',
-    wereadCookieLabel: 'Cookie',
-    wereadCookieHint: '1. Open weread.qq.com and login\n2. F12 → Application → Cookies → Copy all\n3. Paste below and click Validate',
-    wereadValidate: 'Validate',
+    wereadDesc: 'Sync highlights, notes, and reviews from WeRead.',
+    wereadOpen: 'Open WeRead',
+    wereadCookieLabel: 'Paste Cookie',
     wereadSync: 'Sync All',
-    wereadValid: 'Cookie valid, ready to sync',
-    wereadInvalid: 'Cookie invalid or expired, please re-login',
     wereadSyncing: 'Syncing...',
-    wereadSynced: 'Sync complete',
-    wereadProgress: 'Progress',
+    wereadValid: 'Cookie valid',
+    wereadInvalid: 'Cookie invalid, please re-login',
     wereadBooks: 'books',
     wereadHighlights: 'highlights',
     wereadNotes: 'notes',
     wereadReviews: 'reviews',
     wereadSkipped: 'duplicates skipped',
-    wereadErrors: 'errors',
   },
 }
 
@@ -314,11 +306,13 @@ function byRecent(a: Fragment, b: Fragment): number {
 function App() {
   const [lang, setLang] = useState<Lang>('zh')
   const [page, setPage] = useState<Page>('room')
-  const [showIntro, setShowIntro] = useState(true)
+  const [showSplash, setShowSplash] = useState(true)
+  const [showIntro, setShowIntro] = useState(false)
   const [introPage, setIntroPage] = useState(0)
   const { user, configured: authConfigured, logout } = useAuth()
 
   useEffect(() => {
+    if (showSplash) return
     if (showIntro) {
       document.body.style.overflow = 'hidden'
       document.body.style.position = 'fixed'
@@ -333,7 +327,13 @@ function App() {
       document.body.style.position = ''
       document.body.style.width = ''
     }
-  }, [showIntro])
+  }, [showSplash, showIntro])
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setShowSplash(false), 2400)
+    const t2 = setTimeout(() => setShowIntro(true), 2600)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [])
   const [books, setBooks] = useState<Book[]>([])
   const [archiveFragments, setArchiveFragments] = useState<Fragment[]>([])
   const [imports, setImports] = useState<ImportRecord[]>([])
@@ -343,7 +343,7 @@ function App() {
   const [exportLabel, setExportLabel] = useState('')
   const [importLabel, setImportLabel] = useState('')
   const [wereadCookie, setWereadCookie] = useState('')
-  const [wereadStatus, setWereadStatus] = useState<'idle' | 'validating' | 'syncing' | 'done' | 'error'>('idle')
+  const [wereadStatus, setWereadStatus] = useState<'idle' | 'syncing' | 'done' | 'error'>('idle')
   const [wereadMessage, setWereadMessage] = useState('')
   const [wereadProgress, setWereadProgress] = useState<WeReadSyncProgress | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -554,40 +554,23 @@ function App() {
     setTimeout(() => setImportLabel(''), 3000)
   }
 
-  async function handleWeReadValidate() {
-    if (!wereadCookie.trim()) {
-      setWereadStatus('error')
-      setWereadMessage(lang === 'zh' ? '请先粘贴 Cookie' : 'Please paste your cookie first')
-      return
-    }
-    setWereadStatus('validating')
-    setWereadMessage('')
-    try {
-      const client = new WeReadClient(wereadCookie.trim())
-      const valid = await client.validate()
-      if (valid) {
-        setWereadStatus('idle')
-        setWereadMessage(t.wereadValid)
-      } else {
-        setWereadStatus('error')
-        setWereadMessage(t.wereadInvalid)
-      }
-    } catch {
-      setWereadStatus('error')
-      setWereadMessage(t.wereadInvalid)
-    }
-  }
-
   async function handleWeReadSync() {
     if (!wereadCookie.trim()) {
       setWereadStatus('error')
-      setWereadMessage(lang === 'zh' ? '请先粘贴 Cookie' : 'Please paste your cookie first')
+      setWereadMessage(lang === 'zh' ? '请先粘贴 Cookie' : 'Please paste cookie first')
       return
     }
     setWereadStatus('syncing')
     setWereadMessage(t.wereadSyncing)
     setWereadProgress(null)
     try {
+      const client = new WeReadClient(wereadCookie.trim())
+      const valid = await client.validate()
+      if (!valid) {
+        setWereadStatus('error')
+        setWereadMessage(t.wereadInvalid)
+        return
+      }
       const { books: booksData, errors: syncErrors } = await syncAllBooks(
         wereadCookie.trim(),
         (progress) => setWereadProgress(progress),
@@ -609,7 +592,6 @@ function App() {
         `${result.stats.totalReviews} ${t.wereadReviews}`,
         `${result.skippedCount} ${t.wereadSkipped}`,
       ]
-      if (result.errors.length > 0) parts.push(`${result.errors.length} ${t.wereadErrors}`)
       setWereadMessage(parts.join(' · '))
     } catch (e) {
       setWereadStatus('error')
@@ -666,6 +648,27 @@ function App() {
   return (
     <main className={`archive is-${lang}`}>
       <div className="paper-noise" />
+      {showSplash && (
+        <section className="splash-screen" aria-label="Archive splash">
+          <div className="splash-icon-wrap">
+            <svg viewBox="0 0 120 120" className="splash-icon-svg">
+              <path className="si-cover" d="M 36 18 H 82 C 90 18, 96 24, 96 32 V 96 H 42 C 34 96, 28 90, 28 82 V 24 C 28 20, 32 18, 36 18 Z" fill="none" stroke="rgba(35,27,19,0.72)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="600" />
+              <path className="si-page" d="M 40 24 V 90 C 40 94, 44 96, 48 96 H 90 V 24 Z" fill="none" stroke="rgba(35,27,19,0.3)" strokeWidth="1.5" strokeDasharray="500" />
+              <line className="si-spine" x1="60" y1="24" x2="60" y2="96" stroke="rgba(159,79,45,0.35)" strokeWidth="1.5" strokeDasharray="200" />
+              <path className="si-text-a" d="M 46 38 Q 56 32, 56 38 Q 56 44, 46 38" fill="none" stroke="rgba(35,27,19,0.25)" strokeWidth="1.2" strokeDasharray="80" />
+              <path className="si-text-b" d="M 64 38 Q 74 32, 74 38 Q 74 44, 64 38" fill="none" stroke="rgba(35,27,19,0.25)" strokeWidth="1.2" strokeDasharray="80" />
+              <path className="si-text-c" d="M 46 54 Q 56 48, 56 54 Q 56 60, 46 54" fill="none" stroke="rgba(35,27,19,0.25)" strokeWidth="1.2" strokeDasharray="80" />
+              <path className="si-text-d" d="M 64 54 Q 74 48, 74 54 Q 74 60, 64 54" fill="none" stroke="rgba(35,27,19,0.25)" strokeWidth="1.2" strokeDasharray="80" />
+              <rect className="si-spine-bar" x="20" y="24" width="10" height="72" rx="2" fill="rgba(159,79,45,0.12)" strokeDasharray="300" />
+              <line className="si-spine-line-1" x1="23" y1="32" x2="27" y2="32" stroke="rgba(35,27,19,0.38)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="20" />
+              <line className="si-spine-line-2" x1="23" y1="40" x2="27" y2="40" stroke="rgba(35,27,19,0.38)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="20" />
+              <line className="si-spine-line-3" x1="23" y1="48" x2="27" y2="48" stroke="rgba(35,27,19,0.38)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="20" />
+            </svg>
+          </div>
+          <h2 className="splash-title">Archive</h2>
+          <p className="splash-sub">{lang === 'zh' ? '一间纸上的房间' : 'A paper room for reading'}</p>
+        </section>
+      )}
       {showIntro && (
         <section className="intro-screen" aria-label="Archive introduction">
           {introPage === 0 && (
@@ -860,6 +863,27 @@ function App() {
                     <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
                       {lang === 'zh' ? 'English' : '中文'}
                     </button>
+                  </div>
+                  <div className="auth-section">
+                    <span className="auth-section-label">
+                      {lang === 'zh' ? '可选 · 登录以同步你的阅读' : 'Optional · Log in to sync your reading'}
+                    </span>
+                    {user ? (
+                      <div className="auth-user-badge">
+                        <span className="auth-email">{user.email}</span>
+                        <button type="button" className="auth-logout" onClick={logout}>
+                          {lang === 'zh' ? '登出' : 'Log out'}
+                        </button>
+                      </div>
+                    ) : authConfigured ? (
+                      <AuthForm lang={lang} />
+                    ) : (
+                      <p className="auth-coming-soon">
+                        {lang === 'zh'
+                          ? '登录同步功能即将上线。配置 Supabase 后即可使用。'
+                          : 'Login sync coming soon. Configure Supabase to enable.'}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="start-demo-stage" aria-hidden="true">
@@ -1378,8 +1402,7 @@ function App() {
                   </div>
                 </article>
 
-                {authConfigured && (
-                  <article className="settings-card">
+                <article className="settings-card">
                     <span className="settings-section-label">
                       {lang === 'zh' ? '账户' : 'Account'}
                     </span>
@@ -1391,12 +1414,17 @@ function App() {
                             {lang === 'zh' ? '登出' : 'Log out'}
                           </button>
                         </div>
-                      ) : (
+                      ) : authConfigured ? (
                         <AuthForm lang={lang} />
+                      ) : (
+                        <p className="auth-coming-soon">
+                          {lang === 'zh'
+                            ? '登录同步功能即将上线。配置 Supabase 后即可使用。'
+                            : 'Login sync coming soon. Configure Supabase to enable.'}
+                        </p>
                       )}
                     </div>
                   </article>
-                )}
 
                 <article className="settings-card">
                   <span className="settings-section-label">{t.displaySection}</span>
@@ -1478,36 +1506,30 @@ function App() {
                   <span className="settings-section-label">{t.wereadTitle}</span>
                   <p className="weread-desc">{t.wereadDesc}</p>
                   <div className="settings-toggle-group">
-                    <div className="weread-hint">
-                      {t.wereadCookieHint.split('\n').map((line, i) => (
-                        <span key={i}>{line}<br /></span>
-                      ))}
-                    </div>
-                    <div className="settings-toggle-row">
-                      <span>{t.wereadCookieLabel}</span>
+                    <div className="weread-actions">
+                      <a
+                        href="https://weread.qq.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="weread-open-btn"
+                      >
+                        {t.wereadOpen}
+                      </a>
                     </div>
                     <textarea
                       className="weread-cookie-input"
                       value={wereadCookie}
                       onChange={(e) => setWereadCookie(e.target.value)}
-                      placeholder={lang === 'zh' ? '粘贴 Cookie...' : 'Paste cookie here...'}
-                      rows={3}
+                      placeholder={t.wereadCookieLabel}
+                      rows={2}
                       spellCheck={false}
                     />
                     <div className="weread-actions">
                       <button
                         type="button"
-                        className="export-btn"
-                        onClick={handleWeReadValidate}
-                        disabled={wereadStatus === 'validating' || wereadStatus === 'syncing'}
-                      >
-                        {t.wereadValidate}
-                      </button>
-                      <button
-                        type="button"
                         className="weread-sync-btn"
                         onClick={handleWeReadSync}
-                        disabled={wereadStatus === 'validating' || wereadStatus === 'syncing'}
+                        disabled={wereadStatus === 'syncing'}
                       >
                         {wereadStatus === 'syncing' ? t.wereadSyncing : t.wereadSync}
                       </button>
@@ -1520,9 +1542,6 @@ function App() {
                             style={{ width: `${wereadProgress.total > 0 ? (wereadProgress.current / wereadProgress.total) * 100 : 0}%` }}
                           />
                         </div>
-                        <span className="weread-progress-text">
-                          {wereadProgress.phase} [{wereadProgress.current}/{wereadProgress.total}] {wereadProgress.bookTitle}
-                        </span>
                       </div>
                     )}
                     {wereadMessage && (
