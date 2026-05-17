@@ -5,6 +5,6 @@ export { importClippings } from './importer'
 export { computeSourceHash } from './importer/dedup'
 export type { ImportResult, Repository } from './importer/importer'
 
-export { createDatabase, createRepositoryAdapter } from './database'
+export { createDatabase, createRepositoryAdapter, seedIfNeeded } from './database'
 export type { Book, Fragment, ImportRecord, Mood, FragmentMood } from './database/types'
 export type { Database } from './database/interfaces'

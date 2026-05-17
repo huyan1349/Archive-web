@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import DevPanel from './DevPanel'
 
 type Lang = 'zh' | 'en'
 
@@ -239,6 +240,7 @@ function App() {
           </div>
         </div>
       </section>
+      <DevPanel />
     </main>
   )
 }
