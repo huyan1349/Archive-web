@@ -187,6 +187,13 @@ function App() {
     return Array.from(groups.values())
   }, [lang, sortedFragments])
 
+  const topBooks = bookSummaries.slice(0, 3)
+  const latestNote = sortedFragments.find((fragment) => fragment.type === 'note' && fragment.content) ?? readableFragments[1]
+  const archiveIssue =
+    lang === 'zh'
+      ? `${formatMonth(sortedFragments.at(-1)?.clippedAt ?? null, lang)} - ${formatMonth(sortedFragments[0]?.clippedAt ?? null, lang)}`
+      : `${formatMonth(sortedFragments.at(-1)?.clippedAt ?? null, lang)} - ${formatMonth(sortedFragments[0]?.clippedAt ?? null, lang)}`
+
   async function loadArchive(options?: { seed?: boolean }) {
     const db = await createDatabase()
     if (options?.seed) {
@@ -296,10 +303,14 @@ function App() {
       </header>
 
       {page === 'room' && (
-      <section className="poster">
+      <section className="poster home-poster">
         <div className="poster-rule top-rule" />
         <div className="hero-grid" id="room">
           <div className="hero-copy">
+            <div className="archive-issue">
+              <span>Archive Issue 01</span>
+              <span>{archiveIssue}</span>
+            </div>
             <p className="eyebrow">{t.eyebrow}</p>
             <h1>
               {t.heroTitle}
@@ -325,11 +336,23 @@ function App() {
               />
               <span>{status}</span>
             </div>
-            <div className="archive-stats">
-              <strong>{stats.books}</strong><span>{t.books}</span>
-              <strong>{stats.fragments}</strong><span>{t.fragments}</span>
-              <strong>{stats.highlights}</strong><span>{t.highlights}</span>
-              <strong>{stats.notes}</strong><span>{t.notes}</span>
+            <div className="archive-ledger">
+              <div>
+                <strong>{stats.books}</strong>
+                <span>{t.books}</span>
+              </div>
+              <div>
+                <strong>{stats.fragments}</strong>
+                <span>{t.fragments}</span>
+              </div>
+              <div>
+                <strong>{stats.highlights}</strong>
+                <span>{t.highlights}</span>
+              </div>
+              <div>
+                <strong>{stats.notes}</strong>
+                <span>{t.notes}</span>
+              </div>
             </div>
           </div>
 
@@ -346,10 +369,29 @@ function App() {
           </div>
         </div>
 
-        <div className="poster-caption">
-          <span>{t.captionOne}</span>
-          <span>{t.captionTwo}</span>
-          <span>{t.captionThree}</span>
+        <div className="home-spread">
+          <aside className="reading-index-card">
+            <span>{lang === 'zh' ? '藏书索引' : 'Reading index'}</span>
+            {topBooks.map(({ book, count }, index) => (
+              <button type="button" key={book.id} onClick={() => openBookRoom(book.id)}>
+                <small>{String(index + 1).padStart(2, '0')}</small>
+                <strong>{book.title}</strong>
+                <em>{count} {t.fragments}</em>
+              </button>
+            ))}
+          </aside>
+
+          <article className="note-specimen">
+            <span>{lang === 'zh' ? '边注标本' : 'Marginal note'}</span>
+            <p>{latestNote?.content || t.emptyQuote}</p>
+            <small>{latestNote ? formatDate(latestNote.clippedAt, lang) : t.referenceFile}</small>
+          </article>
+
+          <div className="poster-caption">
+            <span>{t.captionOne}</span>
+            <span>{t.captionTwo}</span>
+            <span>{t.captionThree}</span>
+          </div>
         </div>
         <div className="poster-rule bottom-rule" />
       </section>
@@ -408,11 +450,13 @@ function App() {
             </p>
           )}
         </div>
-        <div className="library-panel">
-          {bookSummaries.map(({ book, count, latest }) => (
+        <div className="library-panel library-catalog">
+          {bookSummaries.map(({ book, count, latest, quote }, index) => (
             <button type="button" onClick={() => openBookRoom(book.id)} key={book.id}>
+              <small className="catalog-number">{String(index + 1).padStart(2, '0')}</small>
               <span>{book.title}</span>
               <small>{book.author} / {count} {t.fragments} / {formatDate(latest, lang)}</small>
+              <em>{quote || t.noContent}</em>
             </button>
           ))}
         </div>

@@ -45,6 +45,11 @@
   animation: page-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.home-poster {
+  min-height: auto;
+  padding-bottom: clamp(88px, 8vw, 128px);
+}
+
 .poster::before {
   content: '';
   position: absolute;
@@ -251,9 +256,30 @@
   padding-top: 42px;
 }
 
+.home-poster .hero-grid {
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.62fr);
+  min-height: calc(100vh - 260px);
+  align-items: end;
+}
+
 .hero-copy {
   max-width: 870px;
   animation: float-up 720ms 90ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.archive-issue {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  width: fit-content;
+  margin-bottom: 26px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--soft-ink);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .eyebrow,
@@ -413,19 +439,27 @@
   font-style: italic;
 }
 
-.archive-stats {
+.archive-ledger {
   display: grid;
-  grid-template-columns: repeat(4, auto 1fr);
-  gap: 4px 8px;
-  max-width: 720px;
+  grid-template-columns: repeat(4, minmax(92px, 1fr));
+  gap: 1px;
+  max-width: 760px;
   margin-top: 38px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
+  border: 1px solid var(--line);
+  background: var(--line);
   color: var(--soft-ink);
-  align-items: baseline;
 }
 
-.archive-stats strong {
+.archive-ledger div {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  background:
+    linear-gradient(90deg, rgba(35, 27, 19, 0.035) 1px, transparent 1px) 0 0 / 18px 100%,
+    rgba(247, 237, 218, 0.56);
+}
+
+.archive-ledger strong {
   color: var(--rust);
   font-family: var(--serif);
   font-size: clamp(28px, 3vw, 46px);
@@ -433,7 +467,7 @@
   animation: count-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.archive-stats span {
+.archive-ledger span {
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -549,6 +583,116 @@
   font-size: clamp(18px, 2vw, 24px);
   font-style: italic;
   animation: float-up 720ms 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.home-spread {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(280px, 1.1fr) minmax(220px, 0.62fr);
+  gap: 22px;
+  align-items: stretch;
+  margin-top: clamp(24px, 4vw, 60px);
+}
+
+.reading-index-card,
+.note-specimen {
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 14% 16%, rgba(255, 255, 255, 0.42), transparent 12rem),
+    linear-gradient(rgba(35, 27, 19, 0.032) 1px, transparent 1px) 0 0 / 100% 30px,
+    rgba(242, 223, 185, 0.72);
+  box-shadow: 7px 8px 0 rgba(35, 27, 19, 0.08);
+}
+
+.reading-index-card {
+  display: grid;
+  gap: 1px;
+  background-color: var(--line);
+}
+
+.reading-index-card > span,
+.note-specimen > span {
+  display: block;
+  padding: 16px 18px;
+  color: var(--rust);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.reading-index-card button {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: baseline;
+  width: 100%;
+  border: 0;
+  padding: 18px;
+  color: var(--ink);
+  background: rgba(247, 237, 218, 0.72);
+  text-align: left;
+  transition:
+    color 240ms ease,
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 240ms ease;
+}
+
+.reading-index-card button:hover {
+  color: var(--rust);
+  background: rgba(255, 255, 255, 0.34);
+  transform: translateX(5px);
+}
+
+.reading-index-card small,
+.reading-index-card em {
+  color: var(--soft-ink);
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.reading-index-card strong {
+  overflow: hidden;
+  font-family: var(--serif);
+  font-size: clamp(24px, 2.2vw, 36px);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-specimen {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 270px;
+  padding-bottom: 18px;
+  border-radius: 2px 28px 4px 22px;
+  transform: rotate(-0.5deg);
+}
+
+.note-specimen p {
+  padding: 0 24px;
+  font-family: var(--serif);
+  font-size: clamp(26px, 3.1vw, 48px);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
+.note-specimen small {
+  padding: 0 24px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.home-spread .poster-caption {
+  align-content: end;
+  padding: 18px;
+  border-left: 1px solid var(--line);
 }
 
 .fragments,
@@ -799,6 +943,38 @@
     color 240ms ease,
     padding-inline 360ms cubic-bezier(0.16, 1, 0.3, 1),
     background-color 240ms ease;
+}
+
+.library-catalog {
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.library-catalog button {
+  display: grid;
+  grid-template-columns: 56px minmax(220px, 0.72fr) minmax(180px, 0.44fr) minmax(260px, 0.72fr);
+  align-items: start;
+  padding: 26px 0;
+}
+
+.library-catalog .catalog-number {
+  color: var(--rust);
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.2vw, 46px);
+  line-height: 0.92;
+}
+
+.library-catalog button em {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--soft-ink);
+  font-family: var(--serif);
+  font-size: clamp(18px, 1.8vw, 28px);
+  font-style: normal;
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .library-panel button:hover {
@@ -1152,6 +1328,11 @@
   .library {
     padding-inline: clamp(44px, 5.4vw, 104px);
   }
+
+  .home-spread {
+    max-width: 1680px;
+    margin-inline: auto;
+  }
 }
 
 @media (min-width: 1680px) {
@@ -1233,6 +1414,16 @@
     padding: 96px 0 72px;
   }
 
+  .home-poster .hero-grid,
+  .home-spread,
+  .library-catalog button {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-ledger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .hero-copy {
     max-width: 760px;
   }
@@ -1276,6 +1467,24 @@
   .hero-grid {
     min-height: auto;
     padding: 86px 0 42px;
+  }
+
+  .home-poster .hero-grid,
+  .home-spread,
+  .library-catalog button {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-ledger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reading-index-card button {
+    grid-template-columns: 36px 1fr;
+  }
+
+  .reading-index-card em {
+    grid-column: 2;
   }
 
   .room-card {
