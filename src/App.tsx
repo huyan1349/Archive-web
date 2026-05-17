@@ -121,6 +121,40 @@ function byRecent(a: Fragment, b: Fragment): number {
   return (b.clippedAt?.getTime() ?? 0) - (a.clippedAt?.getTime() ?? 0)
 }
 
+function AnimatedText({
+  text,
+  className = '',
+  maxDelay = 900,
+}: {
+  text: string
+  className?: string
+  maxDelay?: number
+}) {
+  return (
+    <span className={`kinetic-text ${className}`} aria-label={text}>
+      {Array.from(text).map((char, index) => {
+        const delay = Math.min(index * 16, maxDelay)
+        const drift = ((index % 5) - 2) * 0.08
+        return (
+          <span
+            aria-hidden="true"
+            className={char === ' ' ? 'kinetic-char is-space' : 'kinetic-char'}
+            key={`${char}-${index}`}
+            style={
+              {
+                '--char-delay': `${delay}ms`,
+                '--char-drift': `${drift}em`,
+              } as CSSProperties
+            }
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+        )
+      })}
+    </span>
+  )
+}
+
 function App() {
   const [lang, setLang] = useState<Lang>('zh')
   const [page, setPage] = useState<Page>('room')
@@ -266,7 +300,7 @@ function App() {
       <header className="archive-topbar">
         <div className="brand">
           <span className="brand-mark">A</span>
-          <span>Archive</span>
+          <span><AnimatedText text="Archive" maxDelay={160} /></span>
         </div>
         <nav className="nav-links" aria-label="Primary navigation">
           {[
@@ -281,7 +315,7 @@ function App() {
               onClick={() => changePage(id as Page)}
               key={id}
             >
-              {label}
+              <AnimatedText text={label} maxDelay={220} />
             </button>
           ))}
           <button
@@ -290,7 +324,7 @@ function App() {
             onClick={() => setLang(nextLang)}
             aria-label={lang === 'zh' ? 'Switch to English' : '切换到中文'}
           >
-            {lang === 'zh' ? '中文 / EN' : 'EN / 中文'}
+            <AnimatedText text={lang === 'zh' ? '中文 / EN' : 'EN / 中文'} maxDelay={180} />
           </button>
         </nav>
       </header>
@@ -300,12 +334,12 @@ function App() {
         <div className="poster-rule top-rule" />
         <div className="hero-grid" id="room">
           <div className="hero-copy">
-            <p className="eyebrow">{t.eyebrow}</p>
+            <p className="eyebrow"><AnimatedText text={t.eyebrow} /></p>
             <h1>
-              {t.heroTitle}
+              <AnimatedText text={t.heroTitle} maxDelay={1100} />
             </h1>
             <p className="intro">
-              {t.intro}
+              <AnimatedText text={t.intro} maxDelay={1200} />
             </p>
             <div className="hero-actions">
               <button type="button" onClick={handleDemoImport}>{t.import}</button>
@@ -337,7 +371,7 @@ function App() {
             <div className="ink-figure" />
             <p className="card-kicker">{t.cardKicker}</p>
             <blockquote>
-              {featuredFragment?.content || t.emptyQuote}
+              <AnimatedText text={featuredFragment?.content || t.emptyQuote} maxDelay={1400} />
             </blockquote>
             <div className="card-footer">
               <span>{stats.fragments} {t.returned}</span>
@@ -347,9 +381,9 @@ function App() {
         </div>
 
         <div className="poster-caption">
-          <span>{t.captionOne}</span>
-          <span>{t.captionTwo}</span>
-          <span>{t.captionThree}</span>
+          <span><AnimatedText text={t.captionOne} /></span>
+          <span><AnimatedText text={t.captionTwo} /></span>
+          <span><AnimatedText text={t.captionThree} /></span>
         </div>
         <div className="poster-rule bottom-rule" />
       </section>
@@ -358,19 +392,19 @@ function App() {
       {page === 'fragments' && (
       <section className="fragments" id="fragments">
         <div className="section-heading">
-          <p>{t.fragmentsLabel}</p>
-          <h2>{t.allFragments}: {stats.fragments} {t.fragments}</h2>
+          <p><AnimatedText text={t.fragmentsLabel} /></p>
+          <h2><AnimatedText text={`${t.allFragments}: ${stats.fragments} ${t.fragments}`} maxDelay={900} /></h2>
         </div>
         <div className="fragment-grid expanded">
           {sortedFragments.map((fragment, index) => {
             const book = bookMap.get(fragment.bookId)
             return (
             <article className="fragment-card" key={fragment.id} style={{ '--tilt': `${(index % 5) - 2}deg` } as CSSProperties}>
-              <span>{typeLabel(fragment.type, lang)} / {formatDate(fragment.clippedAt, lang)}</span>
-              <p>{fragment.content || t.noContent}</p>
+              <span><AnimatedText text={`${typeLabel(fragment.type, lang)} / ${formatDate(fragment.clippedAt, lang)}`} maxDelay={360} /></span>
+              <p><AnimatedText text={fragment.content || t.noContent} maxDelay={900} /></p>
               <footer>
-                <strong>{book?.title ?? t.source}</strong>
-                <small>{book?.author} / {fragment.location ? `Loc. ${fragment.location}` : `Page ${fragment.page ?? '-'}`}</small>
+                <strong><AnimatedText text={book?.title ?? t.source} maxDelay={360} /></strong>
+                <small><AnimatedText text={`${book?.author} / ${fragment.location ? `Loc. ${fragment.location}` : `Page ${fragment.page ?? '-'}`}`} maxDelay={420} /></small>
               </footer>
             </article>
             )
@@ -382,15 +416,15 @@ function App() {
       {page === 'timeline' && (
       <section className="timeline" id="timeline">
         <div className="section-heading">
-          <p>{t.timelineLabel}</p>
-          <h2>{t.timelineTitle}</h2>
+          <p><AnimatedText text={t.timelineLabel} /></p>
+          <h2><AnimatedText text={t.timelineTitle} maxDelay={1000} /></h2>
         </div>
         <div className="timeline-list">
           {timelineGroups.map((item) => (
             <article className="timeline-item" key={item.label}>
-              <span>{item.label}</span>
-              <h3>{Array.from(item.bookIds).map((id) => bookMap.get(id)?.title).filter(Boolean).join(' / ')}</h3>
-              <p>{item.fragments.length} {t.fragments}</p>
+              <span><AnimatedText text={item.label} maxDelay={260} /></span>
+              <h3><AnimatedText text={Array.from(item.bookIds).map((id) => bookMap.get(id)?.title).filter(Boolean).join(' / ')} maxDelay={900} /></h3>
+              <p><AnimatedText text={`${item.fragments.length} ${t.fragments}`} maxDelay={220} /></p>
             </article>
           ))}
         </div>
@@ -400,19 +434,19 @@ function App() {
       {page === 'library' && (
       <section className="library" id="library">
         <div>
-          <p className="eyebrow">{t.libraryLabel}</p>
-          <h2>{t.libraryTitle}</h2>
+          <p className="eyebrow"><AnimatedText text={t.libraryLabel} /></p>
+          <h2><AnimatedText text={t.libraryTitle} maxDelay={900} /></h2>
           {latestImport && (
             <p className="library-note">
-              {t.latestImport}: {formatDate(latestImport.importedAt, lang)} / {latestImport.importedCount} {t.fragments}
+              <AnimatedText text={`${t.latestImport}: ${formatDate(latestImport.importedAt, lang)} / ${latestImport.importedCount} ${t.fragments}`} maxDelay={900} />
             </p>
           )}
         </div>
         <div className="library-panel">
           {bookSummaries.map(({ book, count, latest }) => (
             <button type="button" onClick={() => openBookRoom(book.id)} key={book.id}>
-              <span>{book.title}</span>
-              <small>{book.author} / {count} {t.fragments} / {formatDate(latest, lang)}</small>
+              <span><AnimatedText text={book.title} maxDelay={520} /></span>
+              <small><AnimatedText text={`${book.author} / ${count} ${t.fragments} / ${formatDate(latest, lang)}`} maxDelay={720} /></small>
             </button>
           ))}
         </div>
@@ -422,22 +456,22 @@ function App() {
       {page === 'book' && selectedBook && (
         <section className="book-room">
           <div className="section-heading">
-            <p>{t.bookRoomLabel}</p>
-            <h2>{selectedBook.title}</h2>
+            <p><AnimatedText text={t.bookRoomLabel} /></p>
+            <h2><AnimatedText text={selectedBook.title} maxDelay={900} /></h2>
           </div>
           <div className="book-room-layout">
             <aside className="book-room-index">
-              <p>{selectedBook.author}</p>
+              <p><AnimatedText text={selectedBook.author} maxDelay={480} /></p>
               <strong>{selectedBookFragments.length}</strong>
-              <span>{t.fragments}</span>
-              <button type="button" onClick={() => changePage('library')}>{t.navLibrary}</button>
+              <span><AnimatedText text={t.fragments} maxDelay={180} /></span>
+              <button type="button" onClick={() => changePage('library')}><AnimatedText text={t.navLibrary} maxDelay={180} /></button>
             </aside>
             <div className="book-fragment-stack">
               {selectedBookFragments.map((fragment) => (
                 <article className="book-fragment" key={fragment.id}>
-                  <span>{typeLabel(fragment.type, lang)} / {formatDate(fragment.clippedAt, lang)}</span>
-                  <p>{fragment.content || t.noContent}</p>
-                  <small>{fragment.location ? `Location ${fragment.location}` : `Page ${fragment.page ?? '-'}`}</small>
+                  <span><AnimatedText text={`${typeLabel(fragment.type, lang)} / ${formatDate(fragment.clippedAt, lang)}`} maxDelay={360} /></span>
+                  <p><AnimatedText text={fragment.content || t.noContent} maxDelay={1100} /></p>
+                  <small><AnimatedText text={fragment.location ? `Location ${fragment.location}` : `Page ${fragment.page ?? '-'}`} maxDelay={260} /></small>
                 </article>
               ))}
             </div>
