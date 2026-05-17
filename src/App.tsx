@@ -635,6 +635,75 @@ function App() {
                 </p>
               </article>
 
+              <div className="room-hero-row">
+                <div className="room-stats-plate">
+                  <div className="stats-plate-header">
+                    <span className="stats-plate-title">{lang === 'zh' ? '藏书统计' : 'Archive Stats'}</span>
+                    <span className="stats-plate-stamp" aria-hidden="true">✦</span>
+                  </div>
+                  <div className="stats-plate-grid">
+                    <div className="stat-cell">
+                      <strong className="stat-number">{stats.books}</strong>
+                      <span className="stat-label">{lang === 'zh' ? '本书' : 'Books'}</span>
+                    </div>
+                    <div className="stat-cell">
+                      <strong className="stat-number">{stats.fragments}</strong>
+                      <span className="stat-label">{lang === 'zh' ? '枚碎片' : 'Fragments'}</span>
+                    </div>
+                    <div className="stat-cell">
+                      <strong className="stat-number">{stats.notes}</strong>
+                      <span className="stat-label">{lang === 'zh' ? '条笔记' : 'Notes'}</span>
+                    </div>
+                    <div className="stat-cell stat-cell-accent">
+                      <strong className="stat-number stat-number-accent">{stats.highlights}</strong>
+                      <span className="stat-label">{lang === 'zh' ? '当前片段' : 'Highlights'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <article className="room-card compact-card" aria-label="Featured reading fragment">
+                  <p className="card-kicker">{t.cardKicker}</p>
+                  <blockquote>{featuredFragment?.content || t.emptyQuote}</blockquote>
+                  <div className="card-footer">
+                    <span>{stats.fragments} {t.returned}</span>
+                    <span>{featuredFragment ? formatDate(featuredFragment.clippedAt, lang) : '00:17'}</span>
+                  </div>
+                </article>
+              </div>
+
+              <div className="room-current-book">
+                <span className="current-book-label">{lang === 'zh' ? '当前书籍' : 'Current Book'}</span>
+                {bookSummaries[0] && (
+                  <button type="button" className="current-book-card" onClick={() => openBookRoom(bookSummaries[0].book.id)}>
+                    <div className="current-book-spine" aria-hidden="true" />
+                    <div className="current-book-info">
+                      <h3 className="current-book-title">{bookSummaries[0].book.title}</h3>
+                      <p className="current-book-author">{bookSummaries[0].book.author} · {bookSummaries[0].count} {lang === 'zh' ? '枚碎片' : 'fragments'}</p>
+                    </div>
+                    <span className="current-book-arrow" aria-hidden="true">→</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="room-catalog-strip">
+                <span className="catalog-strip-label">{lang === 'zh' ? '藏书索引' : 'Book Index'}</span>
+                <div className="catalog-strip-scroll">
+                  {bookSummaries.map(({ book, count }, i) => (
+                    <button
+                      type="button"
+                      className="catalog-strip-item"
+                      key={book.id}
+                      style={{ '--csi-delay': `${i * 0.05}s` } as CSSProperties}
+                      onClick={() => openBookRoom(book.id)}
+                    >
+                      <small className="csi-number">{String(i + 1).padStart(2, '0')}</small>
+                      <span className="csi-title">{book.title}</span>
+                      <span className="csi-count">{count}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="room-journal">
                 <div className="journal-head">
                   <span className="journal-head-label">{lang === 'zh' ? '最近进入档案' : 'Recent entries'}</span>
@@ -660,15 +729,6 @@ function App() {
               </div>
 
               <aside className="room-margin">
-                <article className="room-card compact-card" aria-label="Featured reading fragment">
-                  <p className="card-kicker">{t.cardKicker}</p>
-                  <blockquote>{featuredFragment?.content || t.emptyQuote}</blockquote>
-                  <div className="card-footer">
-                    <span>{stats.fragments} {t.returned}</span>
-                    <span>{featuredFragment ? formatDate(featuredFragment.clippedAt, lang) : '00:17'}</span>
-                  </div>
-                </article>
-
                 <article className="note-specimen app-note">
                   <span>{lang === 'zh' ? '边注标本' : 'Marginal note'}</span>
                   <p>{latestNote?.content || t.emptyQuote}</p>
@@ -716,25 +776,6 @@ function App() {
                   </div>
                 </div>
 
-                <div className="scatter-bookmarks">
-                  <span className="bookmarks-label">{lang === 'zh' ? '夹在书页之间' : 'Between the pages'}</span>
-                  <div className="bookmark-threads">
-                    {bookSummaries.slice(0, 4).map(({ book, count, latest }, i) => (
-                      <button
-                        type="button"
-                        className="thread-tag"
-                        key={book.id}
-                        style={{ '--tag-i': i } as CSSProperties}
-                        onClick={() => openBookRoom(book.id)}
-                      >
-                        <span className="tag-dot" aria-hidden="true" />
-                        <span className="tag-title">{book.title}</span>
-                        <span className="tag-count">{count} {t.fragments} · {formatDate(latest, lang)}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 <div className="scatter-inkblot" aria-hidden="true">
                   <span className="blot blot-1" />
                   <span className="blot blot-2" />
@@ -773,34 +814,54 @@ function App() {
 
           {page === 'timeline' && (
             <section className="timeline-wavy" id="timeline">
-              <svg className="timeline-svg-bg" viewBox="0 0 200 800" preserveAspectRatio="none" aria-hidden="true">
+              <svg className="timeline-river-svg" viewBox="0 0 1000 2400" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
                 <path
-                  className="timeline-path-bg"
-                  d="M 100 0 C 140 80, 60 160, 100 240 C 140 320, 60 400, 100 480 C 140 560, 60 640, 100 720 L 100 800"
+                  className="timeline-river-path"
+                  d="M 500 40 C 320 140, 680 280, 500 420 C 320 560, 680 700, 500 840 C 320 980, 680 1120, 500 1260 C 320 1400, 680 1540, 500 1680 C 320 1820, 680 1960, 500 2100 C 380 2200, 620 2320, 500 2400"
                   fill="none"
-                  stroke="rgba(35,27,19,0.1)"
-                  strokeWidth="2"
-                  strokeDasharray="6 4"
+                  stroke="rgba(159,79,45,0.22)"
+                  strokeWidth="3"
+                  strokeDasharray="12 6"
+                  strokeLinecap="round"
                 />
+                <path
+                  className="timeline-river-glow"
+                  d="M 500 40 C 320 140, 680 280, 500 420 C 320 560, 680 700, 500 840 C 320 980, 680 1120, 500 1260 C 320 1400, 680 1540, 500 1680 C 320 1820, 680 1960, 500 2100 C 380 2200, 620 2320, 500 2400"
+                  fill="none"
+                  stroke="rgba(159,79,45,0.06)"
+                  strokeWidth="18"
+                  strokeLinecap="round"
+                />
+                {timelineGroups.map((_, i) => {
+                  const cy = 40 + i * 380
+                  const cx = i % 2 === 0 ? 500 - 80 : 500 + 80
+                  return (
+                    <g key={i} className="timeline-river-dot">
+                      <circle cx={cx} cy={cy} r="6" fill="rgba(159,79,45,0.6)" />
+                      <circle cx={cx} cy={cy} r="3" fill="#f7edd9" />
+                    </g>
+                  )
+                })}
               </svg>
 
-              <div className="timeline-wavy-list">
+              <div className="timeline-river-list">
                 {timelineGroups.map((item, i) => (
                   <article
-                    className={`timeline-wavy-item ${i % 2 === 0 ? 'tw-left' : 'tw-right'}`}
+                    className={`timeline-river-item ${i % 2 === 0 ? 'tr-left' : 'tr-right'}`}
                     key={item.label}
                     style={{
-                      '--tw-rot': `${(i % 3 - 1) * 1.2}deg`,
-                      '--tw-delay': `${i * 0.07}s`,
+                      '--tr-rot': `${(i % 3 - 1) * 1.4}deg`,
+                      '--tr-delay': `${i * 0.08}s`,
+                      '--tr-offset': `${(i % 3) * 24}px`,
                     } as CSSProperties}
                   >
-                    <div className="tw-card">
-                      <div className="tw-card-top">
-                        <span className="tw-month">{item.label}</span>
-                        <span className="tw-count">{item.fragments.length} {t.fragments}</span>
+                    <div className="tr-card">
+                      <div className="tr-card-top">
+                        <span className="tr-month">{item.label}</span>
+                        <span className="tr-count">{item.fragments.length} {t.fragments}</span>
                       </div>
 
-                      <h3 className="tw-books">
+                      <h3 className="tr-books">
                         {Array.from(item.bookIds)
                           .map((id) => bookMap.get(id)?.title)
                           .filter(Boolean)
@@ -808,12 +869,12 @@ function App() {
                           .join(' / ')}
                       </h3>
 
-                      <div className="tw-excerpts">
+                      <div className="tr-excerpts">
                         {item.fragments.slice(0, 3).map((f) => {
                           const bk = bookMap.get(f.bookId)
                           return (
-                            <div className="tw-excerpt" key={f.id}>
-                              <span className="tw-excerpt-mark" aria-hidden="true">"</span>
+                            <div className="tr-excerpt" key={f.id}>
+                              <span className="tr-excerpt-mark" aria-hidden="true">"</span>
                               <p>{f.content.length > 80 ? f.content.slice(0, 80) + '…' : f.content || t.noContent}</p>
                               <small>{bk?.title ?? t.source} · {typeLabel(f.type, lang)}</small>
                             </div>
@@ -821,8 +882,8 @@ function App() {
                         })}
                       </div>
 
-                      <div className="tw-pin" aria-hidden="true">
-                        <span className="tw-pin-head" />
+                      <div className="tr-pin" aria-hidden="true">
+                        <span className="tr-pin-head" />
                       </div>
                     </div>
                   </article>
