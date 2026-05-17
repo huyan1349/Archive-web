@@ -573,30 +573,47 @@ function App() {
             </div>
           </header>
 
-          <section className="workspace-context" aria-label="Archive context">
-            <article>
-              <span>{lang === 'zh' ? '当前片段' : 'Current fragment'}</span>
-              <p>{selectedFragment?.content || t.emptyQuote}</p>
-              <small>{selectedFragmentBook?.title ?? t.source}</small>
-            </article>
-            <article>
-              <span>{lang === 'zh' ? '当前书籍' : 'Current book'}</span>
-              <strong>{selectedBook?.title ?? t.libraryTitle}</strong>
-              <small>{selectedBook?.author ?? t.referenceFile} / {selectedBookSummary?.count ?? 0} {t.fragments}</small>
-            </article>
-            <article className="context-index">
-              <span>{lang === 'zh' ? '藏书索引' : 'Reading index'}</span>
-              <div>
-                {topBooks.map(({ book, count }, index) => (
-                  <button type="button" key={book.id} onClick={() => openBookRoom(book.id)}>
-                    <small>{String(index + 1).padStart(2, '0')}</small>
-                    <strong>{book.title}</strong>
-                    <em>{count}</em>
-        </button>
-                ))}
+          <section className="archive-context" aria-label="Archive context">
+            <article className="context-pane pane-fragment">
+              <div className="pane-emblems" aria-hidden="true">
+                <span className="emblem-quill" />
+                <span className="emblem-ink" />
+              </div>
+              <div className="pane-body">
+                <span className="pane-label">{lang === 'zh' ? '当前片段' : 'Current fragment'}</span>
+                <blockquote>{selectedFragment?.content || t.emptyQuote}</blockquote>
+                <span className="pane-source">{selectedFragmentBook?.title ?? t.source}</span>
               </div>
             </article>
-      </section>
+            <article className="context-pane pane-book">
+              <div className="pane-emblems" aria-hidden="true">
+                <span className="emblem-spine" />
+                <span className="emblem-page" />
+              </div>
+              <div className="pane-body">
+                <span className="pane-label">{lang === 'zh' ? '当前书籍' : 'Current book'}</span>
+                <h3 className="pane-book-title">{selectedBook?.title ?? t.libraryTitle}</h3>
+                <span className="pane-source">{selectedBook?.author ?? t.referenceFile} · {selectedBookSummary?.count ?? 0} {t.fragments}</span>
+              </div>
+            </article>
+            <article className="context-pane pane-index">
+              <div className="pane-emblems" aria-hidden="true">
+                <span className="emblem-ledger" />
+              </div>
+              <div className="pane-body">
+                <span className="pane-label">{lang === 'zh' ? '藏书索引' : 'Reading index'}</span>
+                <div className="index-rows">
+                  {topBooks.map(({ book, count }, index) => (
+                    <button type="button" className="index-row" key={book.id} onClick={() => openBookRoom(book.id)}>
+                      <span className="index-num">{String(index + 1).padStart(2, '0')}</span>
+                      <span className="index-title">{book.title}</span>
+                      <span className="index-count">{count}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </article>
+          </section>
 
           {page === 'room' && (
             <section className="desk-grid">
