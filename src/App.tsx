@@ -21,7 +21,7 @@ const copy = {
     navTimeline: '时间线',
     navLibrary: '藏书',
     eyebrow: '印刷档案 / Kindle 阅读痕迹',
-    heroTitle: '一间纸上的房间，收藏那些曾经击中你的句子。',
+    heroTitle: '欢迎来到 Archive',
     intro:
       'Archive 将 Kindle 划线变成安静的印刷碎片：日期、天气、页边距，以及你阅读时的自己。',
     import: '导入示例档案',
@@ -99,6 +99,34 @@ const copy = {
     introStep3Desc3: '这间书房会记住所有的日期与书页。',
     introStep3Desc4: '数据只留在你自己的设备上，不上传任何内容。',
     replayIntro: '重新播放开场',
+    nextLabel: '下一步',
+    enterLabel: '进入档案',
+    tutorialRoomLabel: '书房',
+    tutorialRoomTitle: '这里是你的阅读主厅。',
+    tutorialRoomDesc1: '时间线、藏书、碎片——',
+    tutorialRoomDesc2: '每一次打开，都像走进一间',
+    tutorialRoomDesc3: '摆满了旧书页的房间。',
+    tutorialFragLabel: '碎片 · Fragments',
+    tutorialFragTitle: 'Kindle 划线变成安静的纸片。',
+    tutorialFragDesc1: '每一枚碎片都被保留了——',
+    tutorialFragDesc2: '日期、天气、页边距，',
+    tutorialFragDesc3: '以及你阅读时的自己。',
+    tutorialTimelineLabel: '时间线 · Timeline',
+    tutorialTimelineTitle: '你的阅读人生，按季节排列。',
+    tutorialTimelineDesc1: '不是冰冷的数字序列，',
+    tutorialTimelineDesc2: '而是一条手绘的河流——',
+    tutorialTimelineDesc3: '每本书都是河上的一个弯。',
+    tutorialLibLabel: '藏书 · Library',
+    tutorialLibTitle: '每一本书，都是一个房间。',
+    tutorialLibDesc1: '点进任意一本书，',
+    tutorialLibDesc2: '你会看到它专属的——',
+    tutorialLibDesc3: '碎片墙、笔记桌和书脊目录。',
+    tutorialStartLabel: '开始使用',
+    tutorialStartTitle: '导入你的 Kindle 笔记。',
+    tutorialStartDesc1: '将 My Clippings.txt 拖入书房。',
+    tutorialStartDesc2: 'Archive 自动解析划线、笔记与书签。',
+    tutorialStartDesc3: '数据只留在你自己的设备上。',
+    tutorialStartDesc4: '不上传任何内容。',
   },
   en: {
     navRoom: 'The Room',
@@ -106,7 +134,7 @@ const copy = {
     navTimeline: 'Timeline',
     navLibrary: 'Library',
     eyebrow: 'Printed archive / Kindle traces',
-    heroTitle: 'A paper room for sentences that once found you.',
+    heroTitle: 'Welcome to Archive',
     intro:
       'Archive turns Kindle highlights into quiet printed fragments: dates, weather, margins, and the memory of who you were while reading.',
     import: 'Import Demo Archive',
@@ -184,6 +212,34 @@ const copy = {
     introStep3Desc3: 'This room remembers every date and every page.',
     introStep3Desc4: 'Your data stays on your device. Nothing is uploaded.',
     replayIntro: 'Replay intro',
+    nextLabel: 'Next',
+    enterLabel: 'Enter Archive',
+    tutorialRoomLabel: 'The Room',
+    tutorialRoomTitle: 'This is your reading hall.',
+    tutorialRoomDesc1: 'Timeline, library, fragments —',
+    tutorialRoomDesc2: 'every visit feels like stepping into',
+    tutorialRoomDesc3: 'a room filled with old pages.',
+    tutorialFragLabel: 'Fragments',
+    tutorialFragTitle: 'Kindle highlights become quiet paper slips.',
+    tutorialFragDesc1: 'Every fragment is preserved —',
+    tutorialFragDesc2: 'the date, the weather, the margins,',
+    tutorialFragDesc3: 'and the memory of who you were while reading.',
+    tutorialTimelineLabel: 'Timeline',
+    tutorialTimelineTitle: 'Your reading life, arranged by season.',
+    tutorialTimelineDesc1: 'Not a cold numeric sequence,',
+    tutorialTimelineDesc2: 'but a hand-drawn river —',
+    tutorialTimelineDesc3: 'each book a bend along the water.',
+    tutorialLibLabel: 'Library',
+    tutorialLibTitle: 'Every book becomes a room.',
+    tutorialLibDesc1: 'Step into any book and find',
+    tutorialLibDesc2: 'its own dedicated space —',
+    tutorialLibDesc3: 'fragment wall, note desk, and spine index.',
+    tutorialStartLabel: 'Getting Started',
+    tutorialStartTitle: 'Import your Kindle notes.',
+    tutorialStartDesc1: 'Drop your My Clippings.txt into the room.',
+    tutorialStartDesc2: 'Archive parses every highlight, note, and bookmark.',
+    tutorialStartDesc3: 'Your data stays on your device.',
+    tutorialStartDesc4: 'Nothing is uploaded anywhere.',
   },
 }
 
@@ -222,6 +278,23 @@ function App() {
   const [page, setPage] = useState<Page>('room')
   const [showIntro, setShowIntro] = useState(() => localStorage.getItem('archive:intro-seen') !== '1')
   const [introPage, setIntroPage] = useState(0)
+
+  useEffect(() => {
+    if (showIntro) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+  }, [showIntro])
   const [books, setBooks] = useState<Book[]>([])
   const [archiveFragments, setArchiveFragments] = useState<Fragment[]>([])
   const [imports, setImports] = useState<ImportRecord[]>([])
@@ -492,21 +565,12 @@ function App() {
           {introPage === 0 && (
             <>
               <div className="intro-rule top-rule" />
-              <div className="intro-hero">
+              <div className="intro-hero intro-hero-welcome">
                 <div>
                   <p className="eyebrow">{t.eyebrow}</p>
                   <h1>{t.heroTitle}</h1>
                   <p className="intro">{t.intro}</p>
-                  <div className="intro-actions">
-                    <button type="button" onClick={() => setIntroPage(1)}>
-                      {lang === 'zh' ? '了解更多' : 'Learn more'}
-                    </button>
-                    <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
-                      {lang === 'zh' ? 'English' : '中文'}
-                    </button>
-                  </div>
                 </div>
-
                 <article className="room-card intro-card" aria-label="Opening fragment">
                   <div className="ink-figure" />
                   <p className="card-kicker">{t.cardKicker}</p>
@@ -523,139 +587,237 @@ function App() {
                 <span>{t.captionThree}</span>
               </div>
               <div className="intro-rule bottom-rule" />
+              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(1)} aria-label={t.nextLabel}>
+                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
+              </button>
             </>
           )}
 
           {introPage === 1 && (
             <>
               <div className="intro-rule top-rule" />
-              <div className="intro-hero intro-hero-rooms">
+              <div className="intro-hero intro-hero-tutor">
                 <div>
-                  <p className="eyebrow">{t.introStep2Label}</p>
-                  <h1>{t.introStep2Title}</h1>
-                  <div className="intro-rooms-grid">
-                    <div className="intro-room-cell">
-                      <span className="ir-icon" aria-hidden="true">📖</span>
-                      <strong>{t.navRoom}</strong>
-                      <p>{t.introStep2Desc1}</p>
-                    </div>
-                    <div className="intro-room-cell">
-                      <span className="ir-icon" aria-hidden="true">📜</span>
-                      <strong>{t.navFragments}</strong>
-                      <p>{t.introStep2Desc2}</p>
-                    </div>
-                    <div className="intro-room-cell">
-                      <span className="ir-icon" aria-hidden="true">⌛</span>
-                      <strong>{t.navTimeline}</strong>
-                      <p>{t.introStep2Desc3}</p>
-                    </div>
-                    <div className="intro-room-cell">
-                      <span className="ir-icon" aria-hidden="true">📚</span>
-                      <strong>{t.navLibrary}</strong>
-                      <p>{t.introStep2Desc4}</p>
-                    </div>
-                  </div>
+                  <p className="eyebrow"><mark>{t.tutorialRoomLabel}</mark></p>
+                  <h1>{t.tutorialRoomTitle}</h1>
+                  <p className="tutor-desc">
+                    <mark>{t.tutorialRoomDesc1}</mark><br />
+                    {t.tutorialRoomDesc2}<br />
+                    <mark>{t.tutorialRoomDesc3}</mark>
+                  </p>
                 </div>
-                <div className="intro-ornament-rooms" aria-hidden="true">
-                  <svg viewBox="0 0 260 340" className="intro-rooms-drawing">
-                    <rect x="40" y="20" width="52" height="200" rx="3" fill="none" stroke="rgba(35,27,19,0.16)" strokeWidth="1.5" transform="rotate(-6, 66, 120)" />
-                    <rect x="100" y="30" width="48" height="180" rx="3" fill="none" stroke="rgba(159,79,45,0.14)" strokeWidth="1.5" transform="rotate(4, 124, 120)" />
-                    <rect x="156" y="14" width="56" height="212" rx="3" fill="none" stroke="rgba(35,27,19,0.18)" strokeWidth="1.5" transform="rotate(-3, 184, 120)" />
-                    <line x1="60" y1="90" x2="60" y2="130" stroke="rgba(35,27,19,0.08)" strokeWidth="6" />
-                    <line x1="124" y1="60" x2="124" y2="100" stroke="rgba(35,27,19,0.06)" strokeWidth="5" />
-                    <line x1="184" y1="80" x2="184" y2="140" stroke="rgba(35,27,19,0.09)" strokeWidth="7" />
-                    <circle cx="66" cy="260" r="4" fill="rgba(159,79,45,0.2)" />
-                    <circle cx="124" cy="280" r="5" fill="rgba(159,79,45,0.16)" />
-                    <circle cx="184" cy="250" r="3.5" fill="rgba(159,79,45,0.22)" />
-                    <path d="M 40 300 C 80 270, 140 310, 180 290" fill="none" stroke="rgba(35,27,19,0.1)" strokeWidth="1" strokeDasharray="4 4" />
+                <div className="tutor-drawing" aria-hidden="true">
+                  <svg viewBox="0 0 320 340" className="tutor-svg">
+                    <rect x="30" y="40" width="260" height="220" rx="6" fill="rgba(247,237,218,0.7)" stroke="rgba(35,27,19,0.5)" strokeWidth="2" strokeDasharray="1200" />
+                    <path d="M 30 70 L 290 70" fill="none" stroke="rgba(35,27,19,0.28)" strokeWidth="1.2" strokeDasharray="500" />
+                    <rect x="44" y="90" width="60" height="80" rx="3" fill="rgba(255,255,255,0.6)" stroke="rgba(35,27,19,0.22)" strokeWidth="1.5" strokeDasharray="300" />
+                    <line x1="74" y1="110" x2="74" y2="145" stroke="rgba(35,27,19,0.15)" strokeWidth="4" strokeDasharray="50" />
+                    <rect x="118" y="86" width="70" height="88" rx="3" fill="rgba(255,255,255,0.5)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.5" strokeDasharray="320" />
+                    <line x1="153" y1="100" x2="153" y2="148" stroke="rgba(159,79,45,0.18)" strokeWidth="5" strokeDasharray="60" />
+                    <rect x="202" y="92" width="56" height="76" rx="3" fill="rgba(255,255,255,0.55)" stroke="rgba(35,27,19,0.18)" strokeWidth="1.5" strokeDasharray="280" />
+                    <line x1="230" y1="108" x2="230" y2="140" stroke="rgba(35,27,19,0.16)" strokeWidth="3" strokeDasharray="45" />
+                    <path d="M 70 210 C 120 190, 180 220, 250 200" fill="none" stroke="rgba(159,79,45,0.18)" strokeWidth="1.8" strokeDasharray="300" />
+                    <circle cx="60" cy="260" r="3" fill="rgba(159,79,45,0.22)" />
+                    <circle cx="160" cy="275" r="4.5" fill="rgba(35,27,19,0.16)" />
+                    <circle cx="260" cy="250" r="3.5" fill="rgba(159,79,45,0.18)" />
+                    <path d="M 40 290 C 90 310, 200 270, 270 300" fill="none" stroke="rgba(35,27,19,0.08)" strokeWidth="1" strokeDasharray="6 8" />
                   </svg>
                 </div>
               </div>
-              <div className="poster-caption intro-caption">
-                <span>{t.captionOne}</span>
-                <span>{t.captionTwo}</span>
-                <span>{t.captionThree}</span>
-              </div>
               <div className="intro-rule bottom-rule" />
+              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(2)} aria-label={t.nextLabel}>
+                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
+              </button>
             </>
           )}
 
           {introPage === 2 && (
             <>
               <div className="intro-rule top-rule" />
-              <div className="intro-hero intro-hero-start">
+              <div className="intro-hero intro-hero-tutor">
                 <div>
-                  <p className="eyebrow">{t.introStep3Label}</p>
-                  <h1>{t.introStep3Title}</h1>
-                  <div className="intro-start-steps">
-                    <div className="intro-start-step">
-                      <span className="iss-number" aria-hidden="true">1</span>
-                      <p>{t.introStep3Desc1}</p>
-                    </div>
-                    <div className="intro-start-step">
-                      <span className="iss-number" aria-hidden="true">2</span>
-                      <p>{t.introStep3Desc2}</p>
-                    </div>
-                    <div className="intro-start-step">
-                      <span className="iss-number" aria-hidden="true">3</span>
-                      <p>{t.introStep3Desc3}</p>
-                    </div>
-                    <div className="intro-start-step">
-                      <span className="iss-number" aria-hidden="true">4</span>
-                      <p>{t.introStep3Desc4}</p>
-                    </div>
-                  </div>
-                  <div className="intro-actions">
-                    <button type="button" onClick={enterArchive}>
-                      {lang === 'zh' ? '进入档案' : 'Enter archive'}
-                    </button>
-                  </div>
+                  <p className="eyebrow"><mark>{t.tutorialFragLabel}</mark></p>
+                  <h1>{t.tutorialFragTitle}</h1>
+                  <p className="tutor-desc">
+                    <mark>{t.tutorialFragDesc1}</mark><br />
+                    {t.tutorialFragDesc2}<br />
+                    <mark>{t.tutorialFragDesc3}</mark>
+                  </p>
                 </div>
-                <div className="intro-ornament-start" aria-hidden="true">
-                  <svg viewBox="0 0 240 300" className="intro-start-drawing">
-                    <rect x="30" y="40" width="180" height="140" rx="4" fill="none" stroke="rgba(35,27,19,0.18)" strokeWidth="1.5" strokeDasharray="6 3" />
-                    <line x1="60" y1="60" x2="60" y2="110" stroke="rgba(35,27,19,0.1)" strokeWidth="8" />
-                    <line x1="100" y1="60" x2="100" y2="90" stroke="rgba(159,79,45,0.12)" strokeWidth="6" />
-                    <line x1="140" y1="60" x2="140" y2="120" stroke="rgba(35,27,19,0.08)" strokeWidth="7" />
-                    <line x1="176" y1="60" x2="176" y2="100" stroke="rgba(159,79,45,0.1)" strokeWidth="5" />
-                    <path d="M 40 200 C 80 210, 120 180, 160 200 C 180 210, 200 190, 210 210" fill="none" stroke="rgba(35,27,19,0.12)" strokeWidth="1.5" />
-                    <circle cx="60" cy="230" r="5" fill="rgba(159,79,45,0.18)" />
-                    <circle cx="120" cy="245" r="3.5" fill="rgba(35,27,19,0.14)" />
-                    <circle cx="180" cy="228" r="4.5" fill="rgba(159,79,45,0.16)" />
+                <div className="tutor-drawing" aria-hidden="true">
+                  <svg viewBox="0 0 320 340" className="tutor-svg">
+                    <rect x="50" y="30" width="80" height="100" rx="2" fill="rgba(255,255,255,0.7)" stroke="rgba(35,27,19,0.38)" strokeWidth="1.6" transform="rotate(-4, 90, 80)" strokeDasharray="320" />
+                    <line x1="60" y1="50" x2="118" y2="50" stroke="rgba(35,27,19,0.14)" strokeWidth="3" transform="rotate(-4, 90, 80)" strokeDasharray="120" />
+                    <line x1="60" y1="64" x2="110" y2="64" stroke="rgba(35,27,19,0.1)" strokeWidth="2.5" transform="rotate(-4, 90, 80)" strokeDasharray="100" />
+                    <line x1="60" y1="78" x2="106" y2="78" stroke="rgba(35,27,19,0.08)" strokeWidth="2" transform="rotate(-4, 90, 80)" strokeDasharray="90" />
+                    <rect x="170" y="50" width="90" height="110" rx="2" fill="rgba(255,255,255,0.65)" stroke="rgba(159,79,45,0.32)" strokeWidth="1.6" transform="rotate(6, 215, 105)" strokeDasharray="360" />
+                    <line x1="182" y1="70" x2="246" y2="70" stroke="rgba(159,79,45,0.12)" strokeWidth="3" transform="rotate(6, 215, 105)" strokeDasharray="130" />
+                    <line x1="182" y1="85" x2="238" y2="85" stroke="rgba(159,79,45,0.1)" strokeWidth="2.5" transform="rotate(6, 215, 105)" strokeDasharray="110" />
+                    <line x1="182" y1="100" x2="230" y2="100" stroke="rgba(159,79,45,0.08)" strokeWidth="2" transform="rotate(6, 215, 105)" strokeDasharray="95" />
+                    <rect x="100" y="180" width="100" height="120" rx="2" fill="rgba(255,255,255,0.6)" stroke="rgba(35,27,19,0.7)" strokeWidth="1.8" transform="rotate(-7, 150, 240)" strokeDasharray="400" />
+                    <line x1="114" y1="200" x2="186" y2="200" stroke="rgba(35,27,19,0.18)" strokeWidth="3.5" transform="rotate(-7, 150, 240)" strokeDasharray="140" />
+                    <line x1="114" y1="218" x2="176" y2="218" stroke="rgba(35,27,19,0.12)" strokeWidth="2.5" transform="rotate(-7, 150, 240)" strokeDasharray="120" />
+                    <line x1="114" y1="236" x2="168" y2="236" stroke="rgba(35,27,19,0.1)" strokeWidth="2" transform="rotate(-7, 150, 240)" strokeDasharray="110" />
+                    <path d="M 60 240 C 80 220, 120 250, 90 270" fill="none" stroke="rgba(159,79,45,0.16)" strokeWidth="1.4" strokeDasharray="80" />
+                    <path d="M 220 230 C 240 210, 280 240, 250 260" fill="none" stroke="rgba(35,27,19,0.12)" strokeWidth="1.4" strokeDasharray="80" />
+                    <circle cx="50" cy="300" r="4" fill="rgba(159,79,45,0.18)" />
+                    <circle cx="260" cy="310" r="5" fill="rgba(35,27,19,0.14)" />
                   </svg>
                 </div>
               </div>
-              <div className="poster-caption intro-caption">
-                <span>{t.captionOne}</span>
-                <span>{t.captionTwo}</span>
-                <span>{t.captionThree}</span>
+              <div className="intro-rule bottom-rule" />
+              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(3)} aria-label={t.nextLabel}>
+                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
+              </button>
+            </>
+          )}
+
+          {introPage === 3 && (
+            <>
+              <div className="intro-rule top-rule" />
+              <div className="intro-hero intro-hero-tutor">
+                <div>
+                  <p className="eyebrow"><mark>{t.tutorialTimelineLabel}</mark></p>
+                  <h1>{t.tutorialTimelineTitle}</h1>
+                  <p className="tutor-desc">
+                    <mark>{t.tutorialTimelineDesc1}</mark><br />
+                    {t.tutorialTimelineDesc2}<br />
+                    <mark>{t.tutorialTimelineDesc3}</mark>
+                  </p>
+                </div>
+                <div className="tutor-drawing" aria-hidden="true">
+                  <svg viewBox="0 0 320 340" className="tutor-svg">
+                    <path d="M 40 80 C 80 140, 120 40, 160 100 C 200 160, 240 60, 280 120" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="800" />
+                    <path d="M 40 80 C 80 140, 120 40, 160 100 C 200 160, 240 60, 280 120" fill="none" stroke="rgba(159,79,45,0.16)" strokeWidth="12" strokeLinecap="round" opacity="0.5" />
+                    <rect x="52" y="72" width="56" height="42" rx="3" fill="rgba(255,255,255,0.75)" stroke="rgba(35,27,19,0.28)" strokeWidth="1.3" strokeDasharray="200" />
+                    <line x1="62" y1="82" x2="96" y2="82" stroke="rgba(35,27,19,0.16)" strokeWidth="2.5" strokeDasharray="70" />
+                    <line x1="62" y1="92" x2="86" y2="92" stroke="rgba(35,27,19,0.1)" strokeWidth="2" strokeDasharray="50" />
+                    <rect x="138" y="96" width="48" height="36" rx="3" fill="rgba(255,255,255,0.7)" stroke="rgba(159,79,45,0.26)" strokeWidth="1.3" strokeDasharray="180" />
+                    <line x1="146" y1="106" x2="176" y2="106" stroke="rgba(159,79,45,0.16)" strokeWidth="2" strokeDasharray="60" />
+                    <rect x="105" y="150" width="66" height="44" rx="3" fill="rgba(255,255,255,0.72)" stroke="rgba(35,27,19,0.24)" strokeWidth="1.3" strokeDasharray="210" />
+                    <line x1="115" y1="162" x2="160" y2="162" stroke="rgba(35,27,19,0.14)" strokeWidth="2.5" strokeDasharray="80" />
+                    <line x1="115" y1="172" x2="148" y2="172" stroke="rgba(35,27,19,0.1)" strokeWidth="2" strokeDasharray="60" />
+                    <rect x="210" y="116" width="60" height="38" rx="3" fill="rgba(255,255,255,0.76)" stroke="rgba(159,79,45,0.28)" strokeWidth="1.3" strokeDasharray="200" />
+                    <line x1="220" y1="128" x2="258" y2="128" stroke="rgba(159,79,45,0.14)" strokeWidth="2.5" strokeDasharray="70" />
+                    <rect x="240" y="62" width="48" height="34" rx="3" fill="rgba(255,255,255,0.68)" stroke="rgba(35,27,19,0.26)" strokeWidth="1.3" strokeDasharray="180" />
+                    <circle cx="80" cy="140" r="4.5" fill="rgba(159,79,45,0.2)" />
+                    <circle cx="162" cy="250" r="5" fill="rgba(35,27,19,0.16)" />
+                    <circle cx="250" cy="200" r="4" fill="rgba(159,79,45,0.18)" />
+                    <circle cx="120" cy="280" r="3.5" fill="rgba(35,27,19,0.14)" />
+                    <path d="M 30 290 Q 160 310, 290 285" fill="none" stroke="rgba(35,27,19,0.08)" strokeWidth="1" strokeDasharray="5 10" />
+                  </svg>
+                </div>
+              </div>
+              <div className="intro-rule bottom-rule" />
+              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(4)} aria-label={t.nextLabel}>
+                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
+              </button>
+            </>
+          )}
+
+          {introPage === 4 && (
+            <>
+              <div className="intro-rule top-rule" />
+              <div className="intro-hero intro-hero-tutor">
+                <div>
+                  <p className="eyebrow"><mark>{t.tutorialLibLabel}</mark></p>
+                  <h1>{t.tutorialLibTitle}</h1>
+                  <p className="tutor-desc">
+                    <mark>{t.tutorialLibDesc1}</mark><br />
+                    {t.tutorialLibDesc2}<br />
+                    <mark>{t.tutorialLibDesc3}</mark>
+                  </p>
+                </div>
+                <div className="tutor-drawing" aria-hidden="true">
+                  <svg viewBox="0 0 320 340" className="tutor-svg">
+                    <rect x="20" y="50" width="50" height="200" rx="3" fill="rgba(255,255,255,0.6)" stroke="rgba(35,27,19,0.38)" strokeWidth="1.6" strokeDasharray="480" />
+                    <rect x="30" y="60" width="30" height="40" rx="2" fill="rgba(159,79,45,0.15)" stroke="rgba(159,79,45,0.28)" strokeWidth="1.2" strokeDasharray="140" />
+                    <rect x="30" y="108" width="30" height="34" rx="2" fill="rgba(35,27,19,0.12)" stroke="rgba(35,27,19,0.22)" strokeWidth="1.2" strokeDasharray="130" />
+                    <rect x="30" y="150" width="30" height="36" rx="2" fill="rgba(159,79,45,0.1)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.2" strokeDasharray="130" />
+                    <rect x="90" y="40" width="55" height="210" rx="3" fill="rgba(255,255,255,0.55)" stroke="rgba(35,27,19,0.5)" strokeWidth="1.8" strokeDasharray="500" />
+                    <rect x="102" y="52" width="32" height="44" rx="2" fill="rgba(35,27,19,0.14)" stroke="rgba(35,27,19,0.26)" strokeWidth="1.2" strokeDasharray="150" />
+                    <rect x="102" y="104" width="32" height="36" rx="2" fill="rgba(159,79,45,0.18)" stroke="rgba(159,79,45,0.28)" strokeWidth="1.2" strokeDasharray="140" />
+                    <rect x="102" y="148" width="32" height="40" rx="2" fill="rgba(35,27,19,0.1)" stroke="rgba(35,27,19,0.2)" strokeWidth="1.2" strokeDasharray="140" />
+                    <rect x="102" y="196" width="32" height="34" rx="2" fill="rgba(159,79,45,0.12)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.2" strokeDasharray="130" />
+                    <rect x="165" y="34" width="58" height="216" rx="3" fill="rgba(255,255,255,0.58)" stroke="rgba(35,27,19,0.44)" strokeWidth="1.7" strokeDasharray="520" />
+                    <rect x="178" y="46" width="34" height="46" rx="2" fill="rgba(159,79,45,0.14)" stroke="rgba(159,79,45,0.26)" strokeWidth="1.2" strokeDasharray="150" />
+                    <rect x="178" y="100" width="34" height="38" rx="2" fill="rgba(35,27,19,0.12)" stroke="rgba(35,27,19,0.22)" strokeWidth="1.2" strokeDasharray="140" />
+                    <rect x="178" y="146" width="34" height="42" rx="2" fill="rgba(159,79,45,0.16)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.2" strokeDasharray="150" />
+                    <rect x="178" y="196" width="34" height="34" rx="2" fill="rgba(35,27,19,0.08)" stroke="rgba(35,27,19,0.2)" strokeWidth="1.2" strokeDasharray="130" />
+                    <rect x="245" y="46" width="50" height="204" rx="3" fill="rgba(255,255,255,0.52)" stroke="rgba(159,79,45,0.36)" strokeWidth="1.5" strokeDasharray="480" />
+                    <rect x="256" y="58" width="30" height="38" rx="2" fill="rgba(35,27,19,0.12)" stroke="rgba(35,27,19,0.22)" strokeWidth="1.2" strokeDasharray="130" />
+                    <rect x="256" y="104" width="30" height="42" rx="2" fill="rgba(159,79,45,0.14)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.2" strokeDasharray="140" />
+                    <rect x="256" y="154" width="30" height="36" rx="2" fill="rgba(35,27,19,0.1)" stroke="rgba(35,27,19,0.2)" strokeWidth="1.2" strokeDasharray="130" />
+                    <path d="M 20 250 H 295" fill="none" stroke="rgba(35,27,19,0.3)" strokeWidth="2.5" strokeDasharray="500" />
+                    <circle cx="55" cy="280" r="4" fill="rgba(159,79,45,0.2)" />
+                    <circle cx="145" cy="300" r="3.5" fill="rgba(35,27,19,0.14)" />
+                    <circle cx="225" cy="285" r="5" fill="rgba(159,79,45,0.16)" />
+                    <path d="M 20 310 Q 160 330, 300 305" fill="none" stroke="rgba(35,27,19,0.06)" strokeWidth="1" strokeDasharray="6 8" />
+                  </svg>
+                </div>
+              </div>
+              <div className="intro-rule bottom-rule" />
+              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(5)} aria-label={t.nextLabel}>
+                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
+              </button>
+            </>
+          )}
+
+          {introPage === 5 && (
+            <>
+              <div className="intro-rule top-rule" />
+              <div className="intro-hero intro-hero-tutor">
+                <div>
+                  <p className="eyebrow"><mark>{t.tutorialStartLabel}</mark></p>
+                  <h1>{t.tutorialStartTitle}</h1>
+                  <p className="tutor-desc">
+                    <mark>{t.tutorialStartDesc1}</mark><br />
+                    {t.tutorialStartDesc2}<br />
+                    <mark>{t.tutorialStartDesc3}</mark><br />
+                    <span className="tutor-dim">{t.tutorialStartDesc4}</span>
+                  </p>
+                  <div className="intro-actions">
+                    <button type="button" onClick={enterArchive}>{t.enterLabel}</button>
+                    <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
+                      {lang === 'zh' ? 'English' : '中文'}
+                    </button>
+                  </div>
+                </div>
+                <div className="tutor-drawing" aria-hidden="true">
+                  <svg viewBox="0 0 320 340" className="tutor-svg">
+                    <rect x="40" y="30" width="240" height="180" rx="5" fill="rgba(255,255,255,0.65)" stroke="rgba(35,27,19,0.42)" strokeWidth="2" strokeDasharray="900" />
+                    <path d="M 50 60 L 270 60" fill="none" stroke="rgba(159,79,45,0.2)" strokeWidth="1.5" strokeDasharray="400" />
+                    <line x1="72" y1="88" x2="72" y2="148" stroke="rgba(35,27,19,0.1)" strokeWidth="7" strokeDasharray="70" />
+                    <line x1="112" y1="88" x2="112" y2="122" stroke="rgba(159,79,45,0.14)" strokeWidth="6" strokeDasharray="50" />
+                    <line x1="152" y1="88" x2="152" y2="152" stroke="rgba(35,27,19,0.08)" strokeWidth="8" strokeDasharray="80" />
+                    <line x1="192" y1="88" x2="192" y2="118" stroke="rgba(159,79,45,0.12)" strokeWidth="5" strokeDasharray="45" />
+                    <line x1="232" y1="88" x2="232" y2="140" stroke="rgba(35,27,19,0.09)" strokeWidth="6" strokeDasharray="65" />
+                    <path d="M 50 166 Q 160 156, 270 166" fill="none" stroke="rgba(35,27,19,0.12)" strokeWidth="1.2" strokeDasharray="200" />
+                    <path d="M 80 230 C 110 200, 150 250, 180 220 C 200 205, 220 240, 250 225" fill="none" stroke="rgba(35,27,19,0.18)" strokeWidth="2" strokeLinecap="round" strokeDasharray="300" />
+                    <path d="M 80 250 L 80 310" fill="none" stroke="rgba(159,79,45,0.16)" strokeWidth="1.2" strokeDasharray="4 6" />
+                    <path d="M 180 240 L 180 310" fill="none" stroke="rgba(35,27,19,0.12)" strokeWidth="1.2" strokeDasharray="4 6" />
+                    <circle cx="55" cy="54" r="5.5" fill="rgba(159,79,45,0.2)" />
+                    <circle cx="265" cy="54" r="5.5" fill="rgba(159,79,45,0.2)" />
+                    <circle cx="80" cy="295" r="4.5" fill="rgba(159,79,45,0.16)" />
+                    <circle cx="180" cy="300" r="5" fill="rgba(35,27,19,0.14)" />
+                  </svg>
+                </div>
               </div>
               <div className="intro-rule bottom-rule" />
             </>
           )}
 
           <div className="intro-dots" role="tablist" aria-label={lang === 'zh' ? '开屏导航' : 'Intro navigation'}>
-            <button
-              type="button"
-              role="tab"
-              className={introPage === 0 ? 'intro-dot active' : 'intro-dot'}
-              onClick={() => setIntroPage(0)}
-              aria-label={lang === 'zh' ? '第1页' : 'Page 1'}
-            />
-            <button
-              type="button"
-              role="tab"
-              className={introPage === 1 ? 'intro-dot active' : 'intro-dot'}
-              onClick={() => setIntroPage(1)}
-              aria-label={lang === 'zh' ? '第2页' : 'Page 2'}
-            />
-            <button
-              type="button"
-              role="tab"
-              className={introPage === 2 ? 'intro-dot active' : 'intro-dot'}
-              onClick={() => setIntroPage(2)}
-              aria-label={lang === 'zh' ? '第3页' : 'Page 3'}
-            />
+            {[0, 1, 2, 3, 4, 5].map((p) => (
+              <button
+                key={p}
+                type="button"
+                role="tab"
+                className={introPage === p ? 'intro-dot active' : 'intro-dot'}
+                onClick={() => setIntroPage(p)}
+                aria-label={lang === 'zh' ? `第${p + 1}页` : `Page ${p + 1}`}
+              />
+            ))}
           </div>
         </section>
       )}
