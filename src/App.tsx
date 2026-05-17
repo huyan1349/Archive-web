@@ -773,54 +773,27 @@ function App() {
 
           {page === 'timeline' && (
             <section className="timeline-wavy" id="timeline">
-              <svg className="timeline-svg" viewBox="0 0 900 2000" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
-                <defs>
-                  <filter id="hand-drawn-filter">
-                    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="noise" />
-                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
-                  </filter>
-                </defs>
+              <svg className="timeline-svg-bg" viewBox="0 0 200 800" preserveAspectRatio="none" aria-hidden="true">
                 <path
-                  className="timeline-path"
-                  d="M 130 60 
-                     C 240 180, 60 300, 130 440 
-                     C 200 580, 60 700, 130 840 
-                     C 200 980, 50 1100, 130 1240 
-                     C 210 1380, 50 1500, 130 1640 
-                     C 210 1760, 50 1860, 130 1960"
+                  className="timeline-path-bg"
+                  d="M 100 0 C 140 80, 60 160, 100 240 C 140 320, 60 400, 100 480 C 140 560, 60 640, 100 720 L 100 800"
                   fill="none"
-                  stroke="rgba(35,27,19,0.18)"
-                  strokeWidth="2.5"
-                  strokeDasharray="8 5"
+                  stroke="rgba(35,27,19,0.1)"
+                  strokeWidth="2"
+                  strokeDasharray="6 4"
                 />
               </svg>
 
               <div className="timeline-wavy-list">
                 {timelineGroups.map((item, i) => (
                   <article
-                    className="timeline-wavy-item"
+                    className={`timeline-wavy-item ${i % 2 === 0 ? 'tw-left' : 'tw-right'}`}
                     key={item.label}
                     style={{
-                      '--tw-top': `${40 + i * 260}px`,
-                      '--tw-side': i % 2 === 0 ? 'left' : 'right',
-                      '--tw-offset': i % 2 === 0 ? '180px' : '180px',
-                      '--tw-rot': `${(i % 3 - 1) * 1.6}deg`,
+                      '--tw-rot': `${(i % 3 - 1) * 1.2}deg`,
                       '--tw-delay': `${i * 0.07}s`,
                     } as CSSProperties}
                   >
-                    <div className="tw-connector" aria-hidden="true">
-                      <svg viewBox="0 0 60 20" className="tw-connector-svg">
-                        <path
-                          d={i % 2 === 0 ? 'M 0 10 Q 30 10, 55 3' : 'M 55 3 Q 30 10, 0 10'}
-                          fill="none"
-                          stroke="rgba(35,27,19,0.2)"
-                          strokeWidth="1.2"
-                          strokeDasharray="3 3"
-                        />
-                      </svg>
-                      <span className="tw-dot" />
-                    </div>
-
                     <div className="tw-card">
                       <div className="tw-card-top">
                         <span className="tw-month">{item.label}</span>
@@ -840,7 +813,7 @@ function App() {
                           const bk = bookMap.get(f.bookId)
                           return (
                             <div className="tw-excerpt" key={f.id}>
-                              <span className="tw-excerpt-mark" aria-hidden="true">“</span>
+                              <span className="tw-excerpt-mark" aria-hidden="true">"</span>
                               <p>{f.content.length > 80 ? f.content.slice(0, 80) + '…' : f.content || t.noContent}</p>
                               <small>{bk?.title ?? t.source} · {typeLabel(f.type, lang)}</small>
                             </div>
@@ -858,7 +831,7 @@ function App() {
             </section>
           )}
 
-          {page === 'library' && (
+{page === 'library' && (
             <section className="library app-library library-shelf" id="library">
               <div className="library-panel library-catalog">
                 {bookSummaries.map(({ book, count, latest, quote }, index) => (
