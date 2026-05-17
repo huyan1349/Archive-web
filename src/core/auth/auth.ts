@@ -1,6 +1,74 @@
 import { getSupabase, isSupabaseConfigured } from './supabase'
 import type { AuthUser, AuthSession, SignUpResult, LoginResult, MagicLinkResult, AuthError } from './types'
 
+const LOCAL_ACCOUNTS: Array<{ username: string; password: string; email: string }> = [
+  { username: 'huyan', password: '1', email: 'huyan@lucerna.archive' },
+]
+
+const SESSION_KEY = 'lucerna:auth-session'
+
+function createLocalSession(account: typeof LOCAL_ACCOUNTS[number]): AuthSession {
+  return {
+    user: {
+      id: `local-${account.username}`,
+      email: account.email,
+      createdAt: new Date().toISOString(),
+    },
+    accessToken: `local-token-${Date.now()}`,
+    expiresAt: Date.now() / 1000 + 86400 * 30,
+  }
+}
+
+function getStoredSession(): AuthSession | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as AuthSession
+    if (parsed.expiresAt && parsed.expiresAt * 1000 < Date.now()) {
+      localStorage.removeItem(SESSION_KEY)
+      return null
+    }
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+function storeSession(session: AuthSession | null): void {
+  if (session) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
+  } else {
+    localStorage.removeItem(SESSION_KEY)
+  }
+}
+
+export function localLogin(username: string, password: string): LoginResult {
+  const account = LOCAL_ACCOUNTS.find(
+    (a) => a.username === username && a.password === password,
+  )
+  if (!account) {
+    return {
+      success: false,
+      error: { message: '用户名或密码不正确' },
+    }
+  }
+  const session = createLocalSession(account)
+  storeSession(session)
+  return { success: true, error: null, session }
+}
+
+export function localLogout(): void {
+  storeSession(null)
+}
+
+export function getLocalSession(): AuthSession | null {
+  return getStoredSession()
+}
+
+export function isLocalSession(): boolean {
+  return !!getStoredSession()
+}
+
 function mapUser(raw: Record<string, unknown>): AuthUser {
   return {
     id: raw.id as string,
@@ -86,12 +154,15 @@ export async function sendMagicLink(email: string): Promise<MagicLinkResult> {
 }
 
 export async function logout(): Promise<void> {
+  localLogout()
   const sb = getSupabase()
-  if (!sb) return
-  await sb.auth.signOut()
+  if (sb) await sb.auth.signOut()
 }
 
 export async function getCurrentSession(): Promise<AuthSession | null> {
+  const local = getLocalSession()
+  if (local) return local
+
   const sb = getSupabase()
   if (!sb) return null
 
@@ -102,6 +173,9 @@ export async function getCurrentSession(): Promise<AuthSession | null> {
 }
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
+  const local = getLocalSession()
+  if (local) return local.user
+
   const sb = getSupabase()
   if (!sb) return null
 

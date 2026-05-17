@@ -1,13 +1,11 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
 import {
-  isSupabaseConfigured,
   getCurrentSession,
   getCurrentUser,
   onAuthStateChange,
   loginWithEmail,
-  signUpWithEmail,
-  sendMagicLink,
   logout as authLogout,
+  isSupabaseConfigured,
 } from './core/auth'
 import type { AuthUser, AuthSession, AuthError } from './core/auth'
 
@@ -17,8 +15,6 @@ interface AuthContextValue {
   loading: boolean
   configured: boolean
   login: (email: string, password: string) => Promise<{ success: boolean; error: AuthError | null }>
-  signup: (email: string, password: string) => Promise<{ success: boolean; error: AuthError | null; needsConfirmation?: boolean }>
-  magicLink: (email: string) => Promise<{ success: boolean; error: AuthError | null }>
   logout: () => Promise<void>
 }
 
@@ -63,18 +59,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [configured])
 
   const login = useCallback(async (email: string, password: string) => {
-    const result = await loginWithEmail(email, password)
-    return { success: result.success, error: result.error }
-  }, [])
-
-  const signup = useCallback(async (email: string, password: string) => {
-    const result = await signUpWithEmail(email, password)
-    return { success: result.success, error: result.error, needsConfirmation: result.needsConfirmation }
-  }, [])
-
-  const magicLink = useCallback(async (email: string) => {
-    const result = await sendMagicLink(email)
-    return { success: result.success, error: result.error }
+    try {
+      const result = await loginWithEmail(email, password)
+      if (result.session) {
+        setSession(result.session)
+        setUser(result.session.user)
+        return { success: true, error: null }
+      }
+      return { success: false, error: result.error ?? null }
+    } catch {
+      return { success: false, error: null }
+    }
   }, [])
 
   const logoutFn = useCallback(async () => {
@@ -84,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, configured, login, signup, magicLink, logout: logoutFn }}>
+    <AuthContext.Provider value={{ user, session, loading, configured, login, logout: logoutFn }}>
       {children}
     </AuthContext.Provider>
   )

@@ -137,7 +137,7 @@ const copy = {
     wereadTitle: '微信读书 / WeRead',
     wereadDesc: '同步微信读书的划线、笔记和书评。',
     wereadOpen: '打开微信读书',
-    wereadHint: '登录后，按 F12 → Application → Cookies → 复制 weread.qq.com 的全部 Cookie',
+    wereadHint: '登录后，右键页面 → 检查 → Application → Cookies → 复制 weread.qq.com 的全部 Cookie',
     wereadCookieLabel: '粘贴 Cookie',
     wereadSync: '一键同步',
     wereadSyncing: '同步中...',
@@ -265,7 +265,7 @@ const copy = {
     wereadTitle: 'WeRead Sync / 微信读书',
     wereadDesc: 'Sync highlights, notes, and reviews from WeRead.',
     wereadOpen: 'Open WeRead',
-    wereadHint: 'After login, press F12 → Application → Cookies → Copy all cookies from weread.qq.com',
+    wereadHint: 'After login, right-click the page → Inspect → Application → Cookies → Copy all cookies from weread.qq.com',
     wereadCookieLabel: 'Paste Cookie',
     wereadSync: 'Sync All',
     wereadSyncing: 'Syncing...',
@@ -313,9 +313,9 @@ function App() {
   const [lang, setLang] = useState<Lang>('zh')
   const [page, setPage] = useState<Page>('room')
   const [showSplash, setShowSplash] = useState(true)
-  const [showIntro, setShowIntro] = useState(false)
+  const [showIntro, setShowIntro] = useState(() => localStorage.getItem('archive:intro-seen') !== '1')
   const [introPage, setIntroPage] = useState(0)
-  const { user, configured: authConfigured, logout } = useAuth()
+  const { user, logout } = useAuth()
 
   useEffect(() => {
     if (showSplash) return
@@ -337,7 +337,11 @@ function App() {
 
   useEffect(() => {
     const t1 = setTimeout(() => setShowSplash(false), 2400)
-    const t2 = setTimeout(() => setShowIntro(true), 2600)
+    const t2 = setTimeout(() => {
+      if (localStorage.getItem('archive:intro-seen') !== '1') {
+        setShowIntro(true)
+      }
+    }, 2600)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
   const [books, setBooks] = useState<Book[]>([])
@@ -875,14 +879,8 @@ function App() {
                           {lang === 'zh' ? '登出' : 'Log out'}
                         </button>
                       </div>
-                    ) : authConfigured ? (
-                      <AuthForm lang={lang} />
                     ) : (
-                      <p className="auth-coming-soon">
-                        {lang === 'zh'
-                          ? '登录同步功能即将上线。配置 Supabase 后即可使用。'
-                          : 'Login sync coming soon. Configure Supabase to enable.'}
-                      </p>
+                      <AuthForm lang={lang} />
                     )}
                   </div>
                 </div>
