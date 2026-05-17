@@ -814,31 +814,39 @@ function App() {
 
           {page === 'timeline' && (
             <section className="timeline-wavy" id="timeline">
-              <svg className="timeline-river-svg" viewBox="0 0 1000 2400" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+              <svg className="timeline-river-svg" viewBox="0 0 1000 2400" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
                 <path
-                  className="timeline-river-path"
-                  d="M 500 40 C 320 140, 680 280, 500 420 C 320 560, 680 700, 500 840 C 320 980, 680 1120, 500 1260 C 320 1400, 680 1540, 500 1680 C 320 1820, 680 1960, 500 2100 C 380 2200, 620 2320, 500 2400"
+                  className="timeline-river-glow"
+                  d="M 180 30 C 400 120, 820 200, 800 380 C 780 560, 200 500, 180 680 C 160 860, 780 920, 800 1100 C 820 1280, 180 1220, 180 1400 C 180 1580, 820 1640, 800 1820 C 780 2000, 200 1940, 200 2120 C 200 2280, 600 2340, 500 2400"
                   fill="none"
-                  stroke="rgba(159,79,45,0.22)"
-                  strokeWidth="3"
-                  strokeDasharray="12 6"
+                  stroke="rgba(159,79,45,0.05)"
+                  strokeWidth="24"
                   strokeLinecap="round"
                 />
                 <path
-                  className="timeline-river-glow"
-                  d="M 500 40 C 320 140, 680 280, 500 420 C 320 560, 680 700, 500 840 C 320 980, 680 1120, 500 1260 C 320 1400, 680 1540, 500 1680 C 320 1820, 680 1960, 500 2100 C 380 2200, 620 2320, 500 2400"
+                  className="timeline-river-path"
+                  d="M 180 30 C 400 120, 820 200, 800 380 C 780 560, 200 500, 180 680 C 160 860, 780 920, 800 1100 C 820 1280, 180 1220, 180 1400 C 180 1580, 820 1640, 800 1820 C 780 2000, 200 1940, 200 2120 C 200 2280, 600 2340, 500 2400"
                   fill="none"
-                  stroke="rgba(159,79,45,0.06)"
-                  strokeWidth="18"
+                  stroke="rgba(159,79,45,0.2)"
+                  strokeWidth="2.5"
+                  strokeDasharray="10 5"
                   strokeLinecap="round"
                 />
                 {timelineGroups.map((_, i) => {
-                  const cy = 40 + i * 380
-                  const cx = i % 2 === 0 ? 500 - 80 : 500 + 80
+                  const points = [
+                    { x: 180, y: 30 },
+                    { x: 800, y: 380 },
+                    { x: 180, y: 680 },
+                    { x: 800, y: 1100 },
+                    { x: 180, y: 1400 },
+                    { x: 800, y: 1820 },
+                    { x: 200, y: 2120 },
+                  ]
+                  const pt = points[i % points.length]
                   return (
-                    <g key={i} className="timeline-river-dot">
-                      <circle cx={cx} cy={cy} r="6" fill="rgba(159,79,45,0.6)" />
-                      <circle cx={cx} cy={cy} r="3" fill="#f7edd9" />
+                    <g key={i} className="timeline-river-dot" style={{ animationDelay: `${0.3 + i * 0.15}s` }}>
+                      <circle cx={pt.x} cy={pt.y} r="7" fill="rgba(159,79,45,0.5)" />
+                      <circle cx={pt.x} cy={pt.y} r="3.5" fill="#f7edd9" />
                     </g>
                   )
                 })}

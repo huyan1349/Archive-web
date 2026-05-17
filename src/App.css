@@ -3088,7 +3088,7 @@
 .timeline-wavy {
   position: relative;
   z-index: 1;
-  padding: 20px clamp(16px, 3vw, 48px) 60px;
+  padding: 24px clamp(16px, 3vw, 48px) 60px;
 }
 
 .timeline-river-svg {
@@ -3119,39 +3119,48 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  max-width: 900px;
+  gap: 0;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
 .timeline-river-item {
   position: relative;
   z-index: 1;
-  max-width: min(480px, 58%);
+  width: 62%;
+  margin-bottom: 18px;
   animation: float-up 560ms var(--tr-delay) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .timeline-river-item.tr-left {
-  align-self: flex-start;
-  margin-left: clamp(8%, 12vw, 18%);
+  margin-right: auto;
+  margin-left: 4%;
 }
 
 .timeline-river-item.tr-right {
-  align-self: flex-end;
-  margin-right: clamp(8%, 12vw, 18%);
+  margin-left: auto;
+  margin-right: 4%;
 }
 
-.timeline-river-item:nth-child(3n) {
-  margin-top: -12px;
+.timeline-river-item:nth-child(3n + 1) {
+  width: 58%;
 }
 
-.timeline-river-item:nth-child(4n + 1) {
-  margin-top: 8px;
+.timeline-river-item:nth-child(3n + 2) {
+  width: 66%;
+}
+
+.timeline-river-item:nth-child(5n + 3) {
+  margin-top: -6px;
+}
+
+.timeline-river-item:nth-child(4n) {
+  margin-top: 4px;
 }
 
 .tr-card {
   position: relative;
-  padding: clamp(18px, 2.5vw, 30px) clamp(18px, 2.5vw, 28px);
+  padding: clamp(16px, 2vw, 26px) clamp(16px, 2vw, 24px);
   border: 1.5px solid rgba(35, 27, 19, 0.22);
   border-radius: 4px 32px 5px 26px;
   background:
