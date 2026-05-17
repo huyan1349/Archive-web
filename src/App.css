@@ -221,70 +221,6 @@
   animation: ink-line 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.kinetic-text {
-  display: inline;
-  white-space: pre-wrap;
-}
-
-.kinetic-char {
-  display: inline-block;
-  min-width: 0.02em;
-  transform: translateY(0) translateX(var(--char-drift, 0));
-  transform-origin: 50% 80%;
-  animation: character-type-in 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: var(--char-delay, 0ms);
-  transition:
-    color 220ms ease,
-    filter 220ms ease,
-    opacity 220ms ease,
-    text-shadow 220ms ease,
-    transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, filter, opacity;
-}
-
-.kinetic-char.is-space {
-  width: 0.3em;
-}
-
-.kinetic-char:hover {
-  color: var(--rust);
-  filter: blur(0);
-  text-shadow:
-    0.02em 0 rgba(159, 79, 45, 0.22),
-    0 0.14em 0 rgba(35, 27, 19, 0.08);
-  transform: translateY(-0.16em) translateX(var(--char-drift, 0)) rotate(-3deg) scale(1.06);
-}
-
-.kinetic-char:hover + .kinetic-char {
-  color: rgba(159, 79, 45, 0.82);
-  transform: translateY(-0.06em) translateX(var(--char-drift, 0)) rotate(1.5deg);
-}
-
-.kinetic-char:has(+ .kinetic-char:hover) {
-  color: rgba(159, 79, 45, 0.72);
-  transform: translateY(-0.04em) translateX(var(--char-drift, 0)) rotate(-1.5deg);
-}
-
-.hero-copy h1 .kinetic-char {
-  animation-duration: 920ms;
-}
-
-.intro .kinetic-char,
-.room-card blockquote .kinetic-char,
-.fragment-card p .kinetic-char,
-.book-fragment p .kinetic-char {
-  animation-duration: 840ms;
-}
-
-.nav-tab .kinetic-char,
-.language-toggle .kinetic-char,
-.eyebrow .kinetic-char,
-.card-kicker .kinetic-char,
-.fragment-card span .kinetic-char,
-.book-fragment span .kinetic-char {
-  animation-duration: 520ms;
-}
-
 .language-toggle {
   border: 1px solid rgba(35, 27, 19, 0.32);
   border-radius: 999px;
@@ -1063,23 +999,6 @@
   }
   50% {
     transform: translate3d(6px, -4px, 0);
-  }
-}
-
-@keyframes character-type-in {
-  0% {
-    opacity: 0;
-    filter: blur(8px);
-    transform: translateY(0.55em) translateX(var(--char-drift, 0)) scale(0.92);
-  }
-  58% {
-    opacity: 1;
-    filter: blur(1.8px);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0) translateX(var(--char-drift, 0)) scale(1);
   }
 }
 
