@@ -24,7 +24,6 @@ const PROXY_PREFIX = '/weread-api'
 
 export class WeReadClient {
   private cookie: string
-  private _userVid: string = ''
 
   constructor(cookie: string) {
     this.cookie = cookie

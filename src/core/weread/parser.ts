@@ -12,7 +12,7 @@
  */
 
 import type { Book, Fragment, ImportRecord, ClippingType } from '../database/types'
-import type { WeReadBookMeta, WeReadSyncResult } from './types'
+import type { WeReadBookData, WeReadSyncResult } from './types'
 import type { Repository } from '../importer/importer'
 
 function generateId(): string {

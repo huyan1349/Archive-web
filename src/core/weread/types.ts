@@ -89,3 +89,10 @@ export interface WeReadSyncResult {
   totalReviews: number
   errors: string[]
 }
+
+export interface WeReadBookData {
+  notebook: WeReadNotebook
+  bookmarks: WeReadBookmark[]
+  reviews: WeReadReview[]
+  chapters: Map<number, { title: string; level: number }>
+}
