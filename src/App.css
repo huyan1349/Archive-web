@@ -46,10 +46,10 @@
 }
 
 .splash-icon-wrap {
-  width: clamp(100px, 18vw, 160px);
+  width: clamp(80px, 14vw, 120px);
   aspect-ratio: 1;
   margin-bottom: 28px;
-  filter: drop-shadow(0 6px 20px rgba(35, 27, 19, 0.1));
+  filter: drop-shadow(0 6px 20px rgba(35, 27, 19, 0.12));
   animation: splash-icon-in 1000ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -58,30 +58,11 @@
   height: 100%;
 }
 
-.splash-icon-svg .si-cover {
-  animation: ink-draw 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+.splash-mark {
+  fill: var(--ink);
+  opacity: 0;
+  animation: splash-mark-in 1200ms 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-
-.splash-icon-svg .si-page {
-  animation: ink-draw 1.4s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.splash-icon-svg .si-spine {
-  animation: ink-draw 1s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.splash-icon-svg .si-text-a { animation: ink-draw 0.8s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.splash-icon-svg .si-text-b { animation: ink-draw 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.splash-icon-svg .si-text-c { animation: ink-draw 0.8s 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.splash-icon-svg .si-text-d { animation: ink-draw 0.8s 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
-
-.splash-icon-svg .si-spine-bar {
-  animation: ink-draw 1s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.splash-icon-svg .si-spine-line-1 { animation: ink-draw 0.6s 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.splash-icon-svg .si-spine-line-2 { animation: ink-draw 0.6s 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.splash-icon-svg .si-spine-line-3 { animation: ink-draw 0.6s 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 .splash-title {
   font-family: var(--serif);
@@ -111,6 +92,19 @@
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes splash-mark-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
   }
 }
 
@@ -4192,6 +4186,14 @@
   transform: rotate(-0.8deg) translate(-1px, -2px);
   box-shadow: 5px 5px 0 rgba(159, 79, 45, 0.3);
   color: var(--paper-light);
+}
+
+.weread-card .weread-hint {
+  margin: 0 0 10px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+  font-family: var(--sans);
 }
 
 .weread-card .weread-cookie-input {

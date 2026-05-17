@@ -137,6 +137,7 @@ const copy = {
     wereadTitle: '微信读书 / WeRead',
     wereadDesc: '同步微信读书的划线、笔记和书评。',
     wereadOpen: '打开微信读书',
+    wereadHint: '登录后，按 F12 → Application → Cookies → 复制 weread.qq.com 的全部 Cookie',
     wereadCookieLabel: '粘贴 Cookie',
     wereadSync: '一键同步',
     wereadSyncing: '同步中...',
@@ -264,6 +265,7 @@ const copy = {
     wereadTitle: 'WeRead Sync / 微信读书',
     wereadDesc: 'Sync highlights, notes, and reviews from WeRead.',
     wereadOpen: 'Open WeRead',
+    wereadHint: 'After login, press F12 → Application → Cookies → Copy all cookies from weread.qq.com',
     wereadCookieLabel: 'Paste Cookie',
     wereadSync: 'Sync All',
     wereadSyncing: 'Syncing...',
@@ -655,18 +657,12 @@ function App() {
       {showSplash && (
         <section className="splash-screen" aria-label="Archive splash">
           <div className="splash-icon-wrap">
-            <svg viewBox="0 0 120 120" className="splash-icon-svg">
-              <path className="si-cover" d="M 36 18 H 82 C 90 18, 96 24, 96 32 V 96 H 42 C 34 96, 28 90, 28 82 V 24 C 28 20, 32 18, 36 18 Z" fill="none" stroke="rgba(35,27,19,0.72)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="600" />
-              <path className="si-page" d="M 40 24 V 90 C 40 94, 44 96, 48 96 H 90 V 24 Z" fill="none" stroke="rgba(35,27,19,0.3)" strokeWidth="1.5" strokeDasharray="500" />
-              <line className="si-spine" x1="60" y1="24" x2="60" y2="96" stroke="rgba(159,79,45,0.35)" strokeWidth="1.5" strokeDasharray="200" />
-              <path className="si-text-a" d="M 46 38 Q 56 32, 56 38 Q 56 44, 46 38" fill="none" stroke="rgba(35,27,19,0.25)" strokeWidth="1.2" strokeDasharray="80" />
-              <path className="si-text-b" d="M 64 38 Q 74 32, 74 38 Q 74 44, 64 38" fill="none" stroke="rgba(35,27,19,0.25)" strokeWidth="1.2" strokeDasharray="80" />
-              <path className="si-text-c" d="M 46 54 Q 56 48, 56 54 Q 56 60, 46 54" fill="none" stroke="rgba(35,27,19,0.25)" strokeWidth="1.2" strokeDasharray="80" />
-              <path className="si-text-d" d="M 64 54 Q 74 48, 74 54 Q 74 60, 64 54" fill="none" stroke="rgba(35,27,19,0.25)" strokeWidth="1.2" strokeDasharray="80" />
-              <rect className="si-spine-bar" x="20" y="24" width="10" height="72" rx="2" fill="rgba(159,79,45,0.12)" strokeDasharray="300" />
-              <line className="si-spine-line-1" x1="23" y1="32" x2="27" y2="32" stroke="rgba(35,27,19,0.38)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="20" />
-              <line className="si-spine-line-2" x1="23" y1="40" x2="27" y2="40" stroke="rgba(35,27,19,0.38)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="20" />
-              <line className="si-spine-line-3" x1="23" y1="48" x2="27" y2="48" stroke="rgba(35,27,19,0.38)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="20" />
+            <svg viewBox="0 0 48 48" className="splash-icon-svg">
+              <path
+                className="splash-mark"
+                fillRule="evenodd"
+                d="M14 8h18c3.3 0 6 2.7 6 6v25H16.5A6.5 6.5 0 0 1 10 32.5V12a4 4 0 0 1 4-4Zm4 5.5v18.8c0 1.2 1 2.2 2.2 2.2H32V13.5H18Zm3.5 4a1.5 1.5 0 0 1 3 0v13a1.5 1.5 0 0 1-3 0v-13Zm-4.5 18.8a1.2 1.2 0 0 0 0 2.4h17a1.2 1.2 0 0 0 0-2.4H17Z"
+              />
             </svg>
           </div>
           <h2 className="splash-title">Archive</h2>
@@ -1520,6 +1516,7 @@ function App() {
                         {t.wereadOpen}
                       </a>
                     </div>
+                    <p className="weread-hint">{t.wereadHint}</p>
                     <textarea
                       className="weread-cookie-input"
                       value={wereadCookie}
