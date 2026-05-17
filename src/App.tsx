@@ -269,7 +269,11 @@ function App() {
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" role="img">
-              <path className="mark-fill" d="M10 40V18.2C10 11.5 15.5 6 22.2 6h3.6C32.5 6 38 11.5 38 18.2V40H10Z" />
+              <path
+                className="mark-fill"
+                fillRule="evenodd"
+                d="M14 8h18c3.3 0 6 2.7 6 6v25H16.5A6.5 6.5 0 0 1 10 32.5V12a4 4 0 0 1 4-4Zm4 5.5v18.8c0 1.2 1 2.2 2.2 2.2H32V13.5H18Zm3.5 4a1.5 1.5 0 0 1 3 0v13a1.5 1.5 0 0 1-3 0v-13Zm-4.5 18.8a1.2 1.2 0 0 0 0 2.4h17a1.2 1.2 0 0 0 0-2.4H17Z"
+              />
             </svg>
           </span>
           <span className="brand-word">Archive</span>
