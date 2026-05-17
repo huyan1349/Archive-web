@@ -129,6 +129,24 @@ const copy = {
     tutorialStartDesc2: 'Archive 自动解析划线、笔记与书签。',
     tutorialStartDesc3: '数据只留在你自己的设备上。',
     tutorialStartDesc4: '不上传任何内容。',
+    wereadSection: '微信读书',
+    wereadTitle: '微信读书 / WeRead',
+    wereadDesc: '一键同步微信读书的划线、笔记和书评。',
+    wereadCookieLabel: 'Cookie',
+    wereadCookieHint: '1. 打开 weread.qq.com 并扫码登录\n2. F12 → Application → Cookies → 复制全部\n3. 粘贴到下方，点击验证',
+    wereadValidate: '验证',
+    wereadSync: '一键同步',
+    wereadValid: 'Cookie 有效，可以同步',
+    wereadInvalid: 'Cookie 无效或已过期，请重新登录',
+    wereadSyncing: '正在同步...',
+    wereadSynced: '同步完成',
+    wereadProgress: '同步进度',
+    wereadBooks: '本书',
+    wereadHighlights: '条划线',
+    wereadNotes: '条笔记',
+    wereadReviews: '条书评',
+    wereadSkipped: '条重复跳过',
+    wereadErrors: '个错误',
   },
   en: {
     navRoom: 'The Room',
@@ -242,6 +260,24 @@ const copy = {
     tutorialStartDesc2: 'Archive parses every highlight, note, and bookmark.',
     tutorialStartDesc3: 'Your data stays on your device.',
     tutorialStartDesc4: 'Nothing is uploaded anywhere.',
+    wereadSection: 'WeRead',
+    wereadTitle: 'WeRead Sync / 微信读书',
+    wereadDesc: 'One-click sync highlights, notes, and reviews from WeRead.',
+    wereadCookieLabel: 'Cookie',
+    wereadCookieHint: '1. Open weread.qq.com and login\n2. F12 → Application → Cookies → Copy all\n3. Paste below and click Validate',
+    wereadValidate: 'Validate',
+    wereadSync: 'Sync All',
+    wereadValid: 'Cookie valid, ready to sync',
+    wereadInvalid: 'Cookie invalid or expired, please re-login',
+    wereadSyncing: 'Syncing...',
+    wereadSynced: 'Sync complete',
+    wereadProgress: 'Progress',
+    wereadBooks: 'books',
+    wereadHighlights: 'highlights',
+    wereadNotes: 'notes',
+    wereadReviews: 'reviews',
+    wereadSkipped: 'duplicates skipped',
+    wereadErrors: 'errors',
   },
 }
 
@@ -306,6 +342,10 @@ function App() {
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const [exportLabel, setExportLabel] = useState('')
   const [importLabel, setImportLabel] = useState('')
+  const [wereadCookie, setWereadCookie] = useState('')
+  const [wereadStatus, setWereadStatus] = useState<'idle' | 'validating' | 'syncing' | 'done' | 'error'>('idle')
+  const [wereadMessage, setWereadMessage] = useState('')
+  const [wereadProgress, setWereadProgress] = useState<WeReadSyncProgress | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const t = copy[lang]
   const nextLang = lang === 'zh' ? 'en' : 'zh'
@@ -512,6 +552,69 @@ function App() {
       setImportLabel(lang === 'zh' ? '恢复失败，请检查文件' : 'Restore failed, check file')
     }
     setTimeout(() => setImportLabel(''), 3000)
+  }
+
+  async function handleWeReadValidate() {
+    if (!wereadCookie.trim()) {
+      setWereadStatus('error')
+      setWereadMessage(lang === 'zh' ? '请先粘贴 Cookie' : 'Please paste your cookie first')
+      return
+    }
+    setWereadStatus('validating')
+    setWereadMessage('')
+    try {
+      const client = new WeReadClient(wereadCookie.trim())
+      const valid = await client.validate()
+      if (valid) {
+        setWereadStatus('idle')
+        setWereadMessage(t.wereadValid)
+      } else {
+        setWereadStatus('error')
+        setWereadMessage(t.wereadInvalid)
+      }
+    } catch {
+      setWereadStatus('error')
+      setWereadMessage(t.wereadInvalid)
+    }
+  }
+
+  async function handleWeReadSync() {
+    if (!wereadCookie.trim()) {
+      setWereadStatus('error')
+      setWereadMessage(lang === 'zh' ? '请先粘贴 Cookie' : 'Please paste your cookie first')
+      return
+    }
+    setWereadStatus('syncing')
+    setWereadMessage(t.wereadSyncing)
+    setWereadProgress(null)
+    try {
+      const { books: booksData, errors: syncErrors } = await syncAllBooks(
+        wereadCookie.trim(),
+        (progress) => setWereadProgress(progress),
+      )
+      if (booksData.length === 0) {
+        setWereadStatus('error')
+        setWereadMessage(syncErrors.length > 0 ? syncErrors.join('; ') : (lang === 'zh' ? '未找到有笔记的书籍' : 'No books with notes found'))
+        return
+      }
+      const db = await createDatabase()
+      const repo = createRepositoryAdapter(db)
+      const result = await importWeReadBooks(booksData, repo, syncErrors)
+      await loadArchive()
+      setWereadStatus('done')
+      const parts = [
+        `${result.stats.totalBooks} ${t.wereadBooks}`,
+        `${result.stats.totalHighlights} ${t.wereadHighlights}`,
+        `${result.stats.totalNotes} ${t.wereadNotes}`,
+        `${result.stats.totalReviews} ${t.wereadReviews}`,
+        `${result.skippedCount} ${t.wereadSkipped}`,
+      ]
+      if (result.errors.length > 0) parts.push(`${result.errors.length} ${t.wereadErrors}`)
+      setWereadMessage(parts.join(' · '))
+    } catch (e) {
+      setWereadStatus('error')
+      setWereadMessage(e instanceof Error ? e.message : 'Sync failed')
+    }
   }
 
   const selectedBookFragments = selectedBook
@@ -1368,6 +1471,65 @@ function App() {
                         {t.clearData}
                       </button>
                     </div>
+                  </div>
+                </article>
+
+                <article className="settings-card weread-card">
+                  <span className="settings-section-label">{t.wereadTitle}</span>
+                  <p className="weread-desc">{t.wereadDesc}</p>
+                  <div className="settings-toggle-group">
+                    <div className="weread-hint">
+                      {t.wereadCookieHint.split('\n').map((line, i) => (
+                        <span key={i}>{line}<br /></span>
+                      ))}
+                    </div>
+                    <div className="settings-toggle-row">
+                      <span>{t.wereadCookieLabel}</span>
+                    </div>
+                    <textarea
+                      className="weread-cookie-input"
+                      value={wereadCookie}
+                      onChange={(e) => setWereadCookie(e.target.value)}
+                      placeholder={lang === 'zh' ? '粘贴 Cookie...' : 'Paste cookie here...'}
+                      rows={3}
+                      spellCheck={false}
+                    />
+                    <div className="weread-actions">
+                      <button
+                        type="button"
+                        className="export-btn"
+                        onClick={handleWeReadValidate}
+                        disabled={wereadStatus === 'validating' || wereadStatus === 'syncing'}
+                      >
+                        {t.wereadValidate}
+                      </button>
+                      <button
+                        type="button"
+                        className="weread-sync-btn"
+                        onClick={handleWeReadSync}
+                        disabled={wereadStatus === 'validating' || wereadStatus === 'syncing'}
+                      >
+                        {wereadStatus === 'syncing' ? t.wereadSyncing : t.wereadSync}
+                      </button>
+                    </div>
+                    {wereadProgress && wereadProgress.phase !== 'done' && (
+                      <div className="weread-progress">
+                        <div className="weread-progress-bar">
+                          <div
+                            className="weread-progress-fill"
+                            style={{ width: `${wereadProgress.total > 0 ? (wereadProgress.current / wereadProgress.total) * 100 : 0}%` }}
+                          />
+                        </div>
+                        <span className="weread-progress-text">
+                          {wereadProgress.phase} [{wereadProgress.current}/{wereadProgress.total}] {wereadProgress.bookTitle}
+                        </span>
+                      </div>
+                    )}
+                    {wereadMessage && (
+                      <div className={`weread-message ${wereadStatus === 'error' ? 'weread-error' : wereadStatus === 'done' ? 'weread-success' : 'weread-info'}`}>
+                        {wereadMessage}
+                      </div>
+                    )}
                   </div>
                 </article>
 

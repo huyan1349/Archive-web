@@ -4052,6 +4052,138 @@
   color: var(--soft-ink);
 }
 
+.weread-card .weread-desc {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.weread-card .weread-hint {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 4px 18px 4px 14px;
+  background:
+    linear-gradient(90deg, rgba(35, 27, 19, 0.02) 1px, transparent 1px) 0 0 / 42px 100%,
+    rgba(35, 27, 19, 0.025);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+  font-family: var(--sans);
+}
+
+.weread-card .weread-cookie-input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(35, 27, 19, 0.18);
+  border-radius: 2px 14px 3px 12px;
+  background:
+    linear-gradient(rgba(35, 27, 19, 0.015) 1px, transparent 1px) 0 0 / 100% 24px,
+    rgba(247, 237, 218, 0.5);
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink);
+  resize: vertical;
+  outline: none;
+  transition: border-color 200ms;
+}
+
+.weread-card .weread-cookie-input:focus {
+  border-color: var(--rust);
+}
+
+.weread-card .weread-cookie-input::placeholder {
+  color: var(--faint);
+}
+
+.weread-card .weread-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.weread-card .weread-sync-btn {
+  padding: 6px 18px;
+  border: 1px solid var(--rust);
+  border-radius: 2px 16px 3px 14px;
+  background: var(--rust);
+  color: var(--paper-light);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transform: rotate(-0.3deg);
+  box-shadow: 3px 3px 0 rgba(159, 79, 45, 0.25);
+  transition: all 180ms;
+}
+
+.weread-card .weread-sync-btn:hover:not(:disabled) {
+  transform: rotate(-0.8deg) translate(-1px, -2px);
+  box-shadow: 5px 5px 0 rgba(159, 79, 45, 0.3);
+}
+
+.weread-card .weread-sync-btn:active:not(:disabled) {
+  transform: rotate(0deg) translate(1px, 1px);
+  box-shadow: 1px 1px 0 rgba(159, 79, 45, 0.35);
+}
+
+.weread-card .weread-sync-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.weread-card .weread-progress {
+  margin-bottom: 10px;
+}
+
+.weread-card .weread-progress-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(35, 27, 19, 0.08);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.weread-card .weread-progress-fill {
+  height: 100%;
+  background: var(--rust);
+  border-radius: 2px;
+  transition: width 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.weread-card .weread-progress-text {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--sans);
+}
+
+.weread-card .weread-message {
+  padding: 8px 14px;
+  border-radius: 2px 14px 3px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  font-family: var(--sans);
+}
+
+.weread-card .weread-info {
+  background: rgba(159, 79, 45, 0.06);
+  color: var(--soft-ink);
+}
+
+.weread-card .weread-success {
+  background: rgba(109, 114, 89, 0.1);
+  color: var(--sage);
+}
+
+.weread-card .weread-error {
+  background: rgba(180, 60, 60, 0.08);
+  color: #a04040;
+}
+
 .confirm-overlay {
   position: fixed;
   inset: 0;
