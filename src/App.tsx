@@ -5,34 +5,35 @@ const fragments = [
     quote:
       'I was within and without, simultaneously enchanted and repelled by the inexhaustible variety of life.',
     book: 'The Great Gatsby',
-    meta: 'Winter 2024 · Location 1821',
+    meta: 'Winter 2024 / Location 1821',
     mood: 'city light',
   },
   {
     quote: '在那些深而不见底的夜里，句子像雨一样落下来。',
     book: 'Norwegian Wood',
-    meta: 'Spring 2025 · Location 711',
+    meta: 'Spring 2025 / Location 711',
     mood: 'rain night',
   },
   {
     quote: 'The sea was the same color as the sky, and silence had weight.',
     book: 'The Stranger',
-    meta: 'Summer 2025 · Location 406',
+    meta: 'Summer 2025 / Location 406',
     mood: 'white heat',
   },
 ]
 
 const timeline = [
-  { season: '2024 Winter', books: 'The Stranger · Snow Country', weather: 'lonely / cold light' },
-  { season: '2025 Spring', books: 'No Longer Human · West with the Night', weather: 'departure / rain' },
-  { season: '2025 Summer', books: 'Borges · The Waves', weather: 'sea / silence' },
+  { season: '2024 Winter', books: 'The Stranger / Snow Country', weather: 'lonely / cold light' },
+  { season: '2025 Spring', books: 'No Longer Human / West with the Night', weather: 'departure / rain' },
+  { season: '2025 Summer', books: 'Borges / The Waves', weather: 'sea / silence' },
 ]
 
 function App() {
   return (
     <main className="archive">
-      <div className="grain" />
+      <div className="paper-noise" />
       <section className="poster">
+        <div className="poster-rule top-rule" />
         <nav className="nav" aria-label="Primary navigation">
           <div className="brand">
             <span className="brand-mark">L</span>
@@ -48,22 +49,22 @@ function App() {
 
         <div className="hero-grid" id="room">
           <div className="hero-copy">
-            <p className="eyebrow">A Quiet Place for Your Reading Life</p>
+            <p className="eyebrow">Printed archive / Kindle traces</p>
             <h1>
-              Enter the room where your reading traces keep breathing.
+              A paper room for sentences that once found you.
             </h1>
             <p className="intro">
-              LUCERNA turns Kindle highlights into a private archive of nights,
-              rooms, weather, and the sentences that once found you.
+              LUCERNA turns Kindle highlights into quiet printed fragments:
+              dates, weather, margins, and the memory of who you were while reading.
             </p>
             <div className="hero-actions">
               <button type="button">Import My Clippings</button>
-              <span>Listening to your Kindle.</span>
+              <span>Collecting traces of reading.</span>
             </div>
           </div>
 
           <div className="room-card" aria-label="Featured reading fragment">
-            <div className="moon" />
+            <div className="ink-figure" />
             <p className="card-kicker">Tonight's fragment</p>
             <blockquote>
               一年前的今晚，你在一本关于孤独的书里，划下了这句话。
@@ -76,16 +77,17 @@ function App() {
         </div>
 
         <div className="poster-caption">
-          <span>Not a dashboard.</span>
-          <span>Not a second brain.</span>
-          <span>A digital reading room.</span>
+          <span>Not a dashboard</span>
+          <span>Not a second brain</span>
+          <span>A printed reading room</span>
         </div>
+        <div className="poster-rule bottom-rule" />
       </section>
 
       <section className="fragments" id="fragments">
         <div className="section-heading">
           <p>Fragments</p>
-          <h2>Collected like paper slips under a warm lamp.</h2>
+          <h2>Collected like torn paper slips, kept between old pages.</h2>
         </div>
         <div className="fragment-grid">
           {fragments.map((fragment) => (
@@ -104,7 +106,7 @@ function App() {
       <section className="timeline" id="timeline">
         <div className="section-heading">
           <p>Reading Timeline</p>
-          <h2>Your reading life, arranged by season instead of statistics.</h2>
+          <h2>Your reading life, arranged by season instead of numbers.</h2>
         </div>
         <div className="timeline-list">
           {timeline.map((item) => (
@@ -125,15 +127,15 @@ function App() {
         <div className="library-panel">
           <div>
             <span>Norwegian Wood</span>
-            <small>Tokyo night rain · 128 fragments</small>
+            <small>Tokyo night rain / 128 fragments</small>
           </div>
           <div>
             <span>The Stranger</span>
-            <small>Algiers sunlight · 64 fragments</small>
+            <small>Algiers sunlight / 64 fragments</small>
           </div>
           <div>
             <span>Snow Country</span>
-            <small>winter silence · 39 fragments</small>
+            <small>winter silence / 39 fragments</small>
           </div>
         </div>
       </section>
