@@ -53,7 +53,7 @@
 }
 
 .poster::after {
-  content: 'LUCERNA / ARCHIVE / 01';
+  content: 'ARCHIVE / READING / 01';
   position: absolute;
   right: clamp(20px, 5vw, 70px);
   bottom: 88px;

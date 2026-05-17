@@ -23,7 +23,7 @@ const copy = {
     eyebrow: '印刷档案 / Kindle 阅读痕迹',
     heroTitle: '一间纸上的房间，收藏那些曾经击中你的句子。',
     intro:
-      'LUCERNA 将 Kindle 划线变成安静的印刷碎片：日期、天气、页边距，以及你阅读时的自己。',
+      'Archive 将 Kindle 划线变成安静的印刷碎片：日期、天气、页边距，以及你阅读时的自己。',
     import: '导入示例档案',
     importMine: '导入我的文件',
     importStatus: '正在收集阅读痕迹。',
@@ -60,7 +60,7 @@ const copy = {
     eyebrow: 'Printed archive / Kindle traces',
     heroTitle: 'A paper room for sentences that once found you.',
     intro:
-      'LUCERNA turns Kindle highlights into quiet printed fragments: dates, weather, margins, and the memory of who you were while reading.',
+      'Archive turns Kindle highlights into quiet printed fragments: dates, weather, margins, and the memory of who you were while reading.',
     import: 'Import Demo Archive',
     importMine: 'Import My File',
     importStatus: 'Collecting traces of reading.',
@@ -253,8 +253,8 @@ function App() {
       <div className="paper-noise" />
       <header className="archive-topbar">
         <div className="brand">
-          <span className="brand-mark">L</span>
-          <span>LUCERNA Archive</span>
+          <span className="brand-mark">A</span>
+          <span>Archive</span>
         </div>
         <nav className="nav-links" aria-label="Primary navigation">
           {[
