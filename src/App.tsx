@@ -850,9 +850,9 @@ function App() {
                     className={`timeline-river-item ${i % 2 === 0 ? 'tr-left' : 'tr-right'}`}
                     key={item.label}
                     style={{
-                      '--tr-rot': `${(i % 3 - 1) * 1.4}deg`,
+                      '--tr-rot': `${(i % 3 - 1) * 1.8}deg`,
                       '--tr-delay': `${i * 0.08}s`,
-                      '--tr-offset': `${(i % 3) * 24}px`,
+                      '--tr-offset': `${(i % 3) * 40}px`,
                     } as CSSProperties}
                   >
                     <div className="tr-card">

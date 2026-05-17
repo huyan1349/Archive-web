@@ -3117,27 +3117,36 @@
 .timeline-river-list {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .timeline-river-item {
   position: relative;
   z-index: 1;
+  max-width: min(480px, 58%);
   animation: float-up 560ms var(--tr-delay) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .timeline-river-item.tr-left {
-  grid-column: 1;
-  padding-right: var(--tr-offset, 0px);
+  align-self: flex-start;
+  margin-left: clamp(8%, 12vw, 18%);
 }
 
 .timeline-river-item.tr-right {
-  grid-column: 2;
-  padding-left: var(--tr-offset, 0px);
+  align-self: flex-end;
+  margin-right: clamp(8%, 12vw, 18%);
+}
+
+.timeline-river-item:nth-child(3n) {
+  margin-top: -12px;
+}
+
+.timeline-river-item:nth-child(4n + 1) {
+  margin-top: 8px;
 }
 
 .tr-card {
