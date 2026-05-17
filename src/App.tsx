@@ -269,12 +269,11 @@ function App() {
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" role="img">
-              <path className="mark-shadow" d="M15 10.8 34.8 8.7c2.1-.2 3.9 1.4 3.9 3.5v24.2c0 2-1.5 3.6-3.5 3.8L15.4 42c-2.2.2-4.1-1.5-4.1-3.7V14.6c0-2 1.6-3.6 3.7-3.8Z" />
-              <path className="mark-page" d="M12.9 8.2 33 10.1c1.8.2 3.1 1.7 3.1 3.5v24.2c0 2.1-1.8 3.7-3.9 3.5l-20.1-2c-1.8-.2-3.1-1.7-3.1-3.5V11.7c0-2.1 1.8-3.7 3.9-3.5Z" />
-              <path className="mark-line" d="M16 18.2c4.8-1.4 9.6-1.1 14.4.8" />
-              <path className="mark-line faint" d="M16 25c4.3-1.1 8.8-1 13.5.4" />
-              <path className="mark-flame" d="M24.1 31.8c3.3-3.5 4.2-7 1.8-10.6-4 2.4-5.7 5.6-4.9 9.6.3 1.7 1.9 2.3 3.1 1Z" />
-              <circle className="mark-seal" cx="34.8" cy="34.5" r="4.3" />
+              <path className="mark-field" d="M10 38.5V16.8c0-4.3 3.5-7.8 7.8-7.8h12.4c4.3 0 7.8 3.5 7.8 7.8v21.7" />
+              <path className="mark-spine" d="M16 38.5V18.2c0-2.4 1.9-4.3 4.3-4.3h7.4c2.4 0 4.3 1.9 4.3 4.3v20.3" />
+              <path className="mark-light" d="M24 30.8c3.4-3.9 3.4-7.7 0-11.6-3.4 3.9-3.4 7.7 0 11.6Z" />
+              <path className="mark-base" d="M14 38.5h20" />
+              <circle className="mark-dot" cx="24" cy="38.5" r="2.2" />
             </svg>
           </span>
           <span>Archive</span>

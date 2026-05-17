@@ -168,46 +168,41 @@
   overflow: visible;
 }
 
-.mark-shadow {
-  fill: rgba(159, 79, 45, 0.18);
-}
-
-.mark-page {
-  fill: #f5e7c9;
-  stroke: var(--ink);
-  stroke-width: 1.8;
-  stroke-linejoin: round;
-}
-
-.mark-line {
+.mark-field,
+.mark-spine,
+.mark-base {
   fill: none;
   stroke: var(--ink);
   stroke-linecap: round;
-  stroke-width: 1.6;
-  opacity: 0.72;
-}
-
-.mark-line.faint {
-  opacity: 0.38;
-}
-
-.mark-flame {
-  fill: var(--rust);
-  stroke: var(--ink);
-  stroke-width: 1.1;
   stroke-linejoin: round;
 }
 
-.mark-seal {
-  fill: none;
-  stroke: var(--ochre);
-  stroke-width: 1.8;
-  opacity: 0.9;
+.mark-field {
+  stroke-width: 2.1;
+  opacity: 0.86;
+}
+
+.mark-spine {
+  stroke-width: 1.35;
+  opacity: 0.38;
+}
+
+.mark-base {
+  stroke-width: 2.1;
+}
+
+.mark-light {
+  fill: var(--rust);
+  opacity: 0.95;
+}
+
+.mark-dot {
+  fill: var(--ochre);
 }
 
 .brand:hover .brand-mark {
-  filter: drop-shadow(3px 3px 0 rgba(159, 79, 45, 0.18));
-  transform: rotate(-5deg) scale(1.06);
+  filter: drop-shadow(0 6px 8px rgba(159, 79, 45, 0.18));
+  transform: translateY(-1px) scale(1.06);
 }
 
 .nav-links {
