@@ -343,6 +343,8 @@
   gap: 28px;
   align-items: end;
   margin-bottom: 42px;
+  max-width: 1540px;
+  margin-inline: auto;
 }
 
 .section-heading h2,
@@ -360,6 +362,8 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+  max-width: 1540px;
+  margin-inline: auto;
 }
 
 .fragment-card {
@@ -434,6 +438,8 @@
   border-radius: 2px 32px 4px 28px;
   overflow: hidden;
   background: var(--line);
+  max-width: 1540px;
+  margin-inline: auto;
 }
 
 .timeline-item {
@@ -467,6 +473,10 @@
   padding-bottom: 120px;
 }
 
+.library > * {
+  min-width: 0;
+}
+
 .library-panel {
   display: grid;
   gap: 14px;
@@ -491,6 +501,167 @@
   align-self: end;
 }
 
+@media (min-width: 1280px) and (min-aspect-ratio: 16 / 10) {
+  .poster {
+    min-height: calc(100vh - clamp(20px, 4vw, 48px));
+    padding-inline: clamp(44px, 5.4vw, 104px);
+  }
+
+  .poster::before {
+    inset: 116px 7.5% auto auto;
+    width: clamp(260px, 22vw, 420px);
+  }
+
+  .poster::after {
+    right: clamp(44px, 5.4vw, 104px);
+    bottom: 104px;
+    font-size: clamp(56px, 6.2vw, 118px);
+  }
+
+  .poster-rule {
+    right: clamp(44px, 5.4vw, 104px);
+    left: clamp(44px, 5.4vw, 104px);
+  }
+
+  .hero-grid {
+    grid-template-columns: minmax(620px, 1.28fr) minmax(360px, 500px);
+    gap: clamp(48px, 5vw, 110px);
+    min-height: calc(100vh - 190px);
+    align-items: end;
+    padding-top: 70px;
+    padding-bottom: 68px;
+  }
+
+  .hero-copy {
+    align-self: center;
+    max-width: 1040px;
+  }
+
+  .hero-copy h1 {
+    max-width: 1080px;
+    font-size: clamp(72px, 7.3vw, 146px);
+  }
+
+  .intro {
+    max-width: 720px;
+  }
+
+  .room-card {
+    align-self: center;
+    min-height: clamp(430px, 56vh, 590px);
+  }
+
+  .poster-caption {
+    position: absolute;
+    left: clamp(44px, 5.4vw, 104px);
+    bottom: 38px;
+    max-width: 760px;
+  }
+
+  .fragments,
+  .timeline,
+  .library {
+    padding-inline: clamp(44px, 5.4vw, 104px);
+  }
+}
+
+@media (min-width: 1680px) {
+  .hero-grid {
+    max-width: 1680px;
+    margin-inline: auto;
+  }
+
+  .fragment-grid {
+    grid-template-columns: 1.08fr 0.92fr 1.08fr;
+    gap: 28px;
+  }
+
+  .fragment-card {
+    min-height: 430px;
+    padding: 34px;
+  }
+
+  .timeline-item {
+    grid-template-columns: 0.26fr 1fr 0.36fr;
+    padding: 34px 40px;
+  }
+
+  .library {
+    grid-template-columns: minmax(420px, 0.72fr) minmax(680px, 1fr);
+    max-width: 1540px;
+    margin-inline: auto;
+  }
+}
+
+@media (max-height: 760px) and (orientation: landscape) {
+  .poster {
+    min-height: auto;
+  }
+
+  .hero-grid {
+    min-height: auto;
+    padding-top: 58px;
+    padding-bottom: 70px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(54px, 6.8vw, 104px);
+    margin: 16px 0 18px;
+  }
+
+  .intro {
+    font-size: 18px;
+  }
+
+  .hero-actions {
+    margin-top: 28px;
+  }
+
+  .room-card {
+    min-height: 360px;
+    padding: 26px;
+  }
+
+  .ink-figure {
+    width: 108px;
+    height: 88px;
+    margin-bottom: 34px;
+  }
+
+  .room-card blockquote {
+    font-size: clamp(26px, 3vw, 40px);
+  }
+}
+
+@media (orientation: portrait) and (min-width: 700px) {
+  .poster {
+    min-height: auto;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 96px 0 72px;
+  }
+
+  .hero-copy {
+    max-width: 760px;
+  }
+
+  .room-card {
+    max-width: 620px;
+    margin-inline: auto;
+  }
+
+  .fragment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fragment-card:nth-child(2) {
+    margin-top: 0;
+  }
+}
+
 @media (max-width: 900px) {
   .nav,
   .hero-grid,
@@ -505,6 +676,11 @@
   }
 
   .nav-links {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .nav-links a {
     display: none;
   }
 
