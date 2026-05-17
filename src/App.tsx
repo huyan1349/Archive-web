@@ -675,6 +675,74 @@ function App() {
                   <small>{latestNote ? formatDate(latestNote.clippedAt, lang) : t.referenceFile}</small>
                 </article>
               </aside>
+
+              <div className="desk-scatter" aria-label="Desk surface elements">
+                <div className="scatter-corkboard">
+                  <div className="cork-texture" aria-hidden="true" />
+                  <span className="cork-label">{lang === 'zh' ? '· 软木板 ·' : '· Corkboard ·'}</span>
+                  <div className="cork-pins">
+                    {readableFragments.slice(2, 7).map((f, i) => {
+                      const bk = bookMap.get(f.bookId)
+                      return (
+                        <div className="cork-pin" key={f.id} style={{ '--pin-x': `${10 + i * 18}%`, '--pin-y': `${8 + (i % 3) * 30}%`, '--pin-rot': `${(i % 5) - 2}deg`, '--pin-delay': `${i * 0.06}s` } as CSSProperties}>
+                          <div className="pin-head" aria-hidden="true" />
+                          <div className="pin-body">
+                            <p className="pin-quote">{f.content.length > 60 ? f.content.slice(0, 60) + '…' : f.content || t.noContent}</p>
+                            <span className="pin-source">— {bk?.title ?? t.source}</span>
+                          </div>
+                          <div className="pin-thread" aria-hidden="true" />
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="scatter-torn-strip">
+                  <div className="torn-paper">
+                    <div className="torn-rip top-rip" aria-hidden="true" />
+                    <p className="torn-text">
+                      {readableFragments[3]?.content || (lang === 'zh' ? '纸页撕下的痕迹，阅读的质感。' : 'The texture of torn paper, the feel of reading.')}
+                    </p>
+                    <span className="torn-ref">{readableFragments[3] ? bookMap.get(readableFragments[3].bookId)?.title : t.source}</span>
+                    <div className="torn-rip bottom-rip" aria-hidden="true" />
+                  </div>
+                  <div className="torn-paper secondary-torn">
+                    <div className="torn-rip top-rip" aria-hidden="true" />
+                    <p className="torn-text">
+                      {readableFragments[5]?.content || (lang === 'zh' ? '另一页的留痕。' : 'A trace from another page.')}
+                    </p>
+                    <div className="torn-rip bottom-rip" aria-hidden="true" />
+                    <div className="washi-tape" aria-hidden="true" />
+                  </div>
+                </div>
+
+                <div className="scatter-bookmarks">
+                  <span className="bookmarks-label">{lang === 'zh' ? '夹在书页之间' : 'Between the pages'}</span>
+                  <div className="bookmark-threads">
+                    {bookSummaries.slice(0, 4).map(({ book, count, latest }, i) => (
+                      <button
+                        type="button"
+                        className="thread-tag"
+                        key={book.id}
+                        style={{ '--tag-i': i } as CSSProperties}
+                        onClick={() => openBookRoom(book.id)}
+                      >
+                        <span className="tag-dot" aria-hidden="true" />
+                        <span className="tag-title">{book.title}</span>
+                        <span className="tag-count">{count} {t.fragments} · {formatDate(latest, lang)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="scatter-inkblot" aria-hidden="true">
+                  <span className="blot blot-1" />
+                  <span className="blot blot-2" />
+                  <span className="blot blot-3" />
+                </div>
+
+                <div className="scatter-coffee-ring" aria-hidden="true" />
+              </div>
             </section>
           )}
 
@@ -704,16 +772,89 @@ function App() {
           )}
 
           {page === 'timeline' && (
-            <section className="timeline app-timeline timeline-scroll" id="timeline">
-              <div className="timeline-list">
-                {timelineGroups.map((item) => (
-                  <article className="timeline-item" key={item.label}>
-                    <span>{item.label}</span>
-                    <h3>{Array.from(item.bookIds).map((id) => bookMap.get(id)?.title).filter(Boolean).join(' / ')}</h3>
-                    <p>{item.fragments.length} {t.fragments}</p>
+            <section className="timeline-wavy" id="timeline">
+              <svg className="timeline-svg" viewBox="0 0 900 2000" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+                <defs>
+                  <filter id="hand-drawn-filter">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="noise" />
+                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
+                  </filter>
+                </defs>
+                <path
+                  className="timeline-path"
+                  d="M 130 60 
+                     C 240 180, 60 300, 130 440 
+                     C 200 580, 60 700, 130 840 
+                     C 200 980, 50 1100, 130 1240 
+                     C 210 1380, 50 1500, 130 1640 
+                     C 210 1760, 50 1860, 130 1960"
+                  fill="none"
+                  stroke="rgba(35,27,19,0.18)"
+                  strokeWidth="2.5"
+                  strokeDasharray="8 5"
+                />
+              </svg>
+
+              <div className="timeline-wavy-list">
+                {timelineGroups.map((item, i) => (
+                  <article
+                    className="timeline-wavy-item"
+                    key={item.label}
+                    style={{
+                      '--tw-top': `${40 + i * 260}px`,
+                      '--tw-side': i % 2 === 0 ? 'left' : 'right',
+                      '--tw-offset': i % 2 === 0 ? '180px' : '180px',
+                      '--tw-rot': `${(i % 3 - 1) * 1.6}deg`,
+                      '--tw-delay': `${i * 0.07}s`,
+                    } as CSSProperties}
+                  >
+                    <div className="tw-connector" aria-hidden="true">
+                      <svg viewBox="0 0 60 20" className="tw-connector-svg">
+                        <path
+                          d={i % 2 === 0 ? 'M 0 10 Q 30 10, 55 3' : 'M 55 3 Q 30 10, 0 10'}
+                          fill="none"
+                          stroke="rgba(35,27,19,0.2)"
+                          strokeWidth="1.2"
+                          strokeDasharray="3 3"
+                        />
+                      </svg>
+                      <span className="tw-dot" />
+                    </div>
+
+                    <div className="tw-card">
+                      <div className="tw-card-top">
+                        <span className="tw-month">{item.label}</span>
+                        <span className="tw-count">{item.fragments.length} {t.fragments}</span>
+                      </div>
+
+                      <h3 className="tw-books">
+                        {Array.from(item.bookIds)
+                          .map((id) => bookMap.get(id)?.title)
+                          .filter(Boolean)
+                          .slice(0, 3)
+                          .join(' / ')}
+                      </h3>
+
+                      <div className="tw-excerpts">
+                        {item.fragments.slice(0, 3).map((f) => {
+                          const bk = bookMap.get(f.bookId)
+                          return (
+                            <div className="tw-excerpt" key={f.id}>
+                              <span className="tw-excerpt-mark" aria-hidden="true">“</span>
+                              <p>{f.content.length > 80 ? f.content.slice(0, 80) + '…' : f.content || t.noContent}</p>
+                              <small>{bk?.title ?? t.source} · {typeLabel(f.type, lang)}</small>
+                            </div>
+                          )
+                        })}
+                      </div>
+
+                      <div className="tw-pin" aria-hidden="true">
+                        <span className="tw-pin-head" />
+                      </div>
+                    </div>
                   </article>
                 ))}
-        </div>
+              </div>
             </section>
           )}
 
