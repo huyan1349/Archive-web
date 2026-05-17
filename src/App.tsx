@@ -12,7 +12,7 @@ import {
 } from './core'
 
 type Lang = 'zh' | 'en'
-type Page = 'room' | 'fragments' | 'timeline' | 'library' | 'book'
+type Page = 'room' | 'fragments' | 'timeline' | 'library' | 'book' | 'settings'
 
 const copy = {
   zh: {
@@ -51,6 +51,41 @@ const copy = {
     openRoom: '进入房间',
     noContent: '这是一枚书签，没有摘录正文。',
     source: '来源',
+    navSettings: '设置',
+    settingsLabel: 'Settings / 设置',
+    settingsTitle: '调整灯光，整理书桌，安静地留在房间里。',
+    aboutHeader: '关于',
+    aboutIntro: 'LUCERNA Archive 是一间保存阅读人生的数字书房。正在安静地归档你的 Kindle 阅读痕迹。',
+    developer: '开发者',
+    developerName: 'huyan',
+    developerEmail: 'huyanxius@gmail.com',
+    dataSection: '数据',
+    importSection: '导入',
+    exportSection: '导出',
+    clearData: '清除所有数据',
+    clearDataDesc: '删除所有导入的书籍、摘录和标记。此操作不可撤销。',
+    clearConfirm: '确认清除所有数据？',
+    clearYes: '确认清除',
+    clearNo: '取消',
+    exportData: '导出档案',
+    exportDataDesc: '将所有书籍和摘录导出为备份文件。',
+    importData: '导入档案备份',
+    importDataDesc: '从之前导出的备份文件中恢复数据。',
+    displaySection: '显示',
+    languageSection: '语言',
+    zhOption: '中文',
+    enOption: 'English',
+    themeSection: '氛围',
+    themeDesc: '即将支持：纸张色温调节',
+    statsSection: '档案概况',
+    totalBooks: '藏书',
+    totalFragments: '碎片',
+    totalImports: '导入次数',
+    lastImport: '最近导入',
+    none: '暂无',
+    version: '版本',
+    versionNum: 'Phase 1 — MVP',
+    tagline: 'A Quiet Place for Your Reading Life.',
   },
   en: {
     navRoom: 'The Room',
@@ -88,6 +123,41 @@ const copy = {
     openRoom: 'Enter room',
     noContent: 'This is a bookmark without excerpt text.',
     source: 'Source',
+    navSettings: 'Settings',
+    settingsLabel: 'Settings',
+    settingsTitle: 'Adjust the lamp, tidy the desk, stay quietly in the room.',
+    aboutHeader: 'About',
+    aboutIntro: 'LUCERNA Archive is a digital reading room for preserving a lifetime of reading. Quietly archiving your Kindle traces.',
+    developer: 'Developer',
+    developerName: 'huyan',
+    developerEmail: 'huyanxius@gmail.com',
+    dataSection: 'Data',
+    importSection: 'Import',
+    exportSection: 'Export',
+    clearData: 'Clear all data',
+    clearDataDesc: 'Delete all imported books, fragments, and marks. This cannot be undone.',
+    clearConfirm: 'Confirm clearing all data?',
+    clearYes: 'Clear all',
+    clearNo: 'Cancel',
+    exportData: 'Export archive',
+    exportDataDesc: 'Export all books and fragments as a backup file.',
+    importData: 'Import archive backup',
+    importDataDesc: 'Restore data from a previously exported backup.',
+    displaySection: 'Display',
+    languageSection: 'Language',
+    zhOption: '中文',
+    enOption: 'English',
+    themeSection: 'Atmosphere',
+    themeDesc: 'Coming: paper warmth adjustment',
+    statsSection: 'Archive overview',
+    totalBooks: 'Books',
+    totalFragments: 'Fragments',
+    totalImports: 'Imports',
+    lastImport: 'Last import',
+    none: 'None',
+    version: 'Version',
+    versionNum: 'Phase 1 — MVP',
+    tagline: 'A Quiet Place for Your Reading Life.',
   },
 }
 
@@ -130,6 +200,9 @@ function App() {
   const [imports, setImports] = useState<ImportRecord[]>([])
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null)
   const [status, setStatus] = useState(copy.zh.importStatus)
+  const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [exportLabel, setExportLabel] = useState('')
+  const [importLabel, setImportLabel] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const t = copy[lang]
   const nextLang = lang === 'zh' ? 'en' : 'zh'
@@ -264,6 +337,75 @@ function App() {
     setShowIntro(false)
   }
 
+  async function handleClearData() {
+    const dbs = await indexedDB.databases()
+    for (const dbInfo of dbs) {
+      if (dbInfo.name === 'lucerna-archive') {
+        indexedDB.deleteDatabase('lucerna-archive')
+      }
+    }
+    setShowClearConfirm(false)
+    setBooks([])
+    setArchiveFragments([])
+    setImports([])
+    setSelectedBookId(null)
+    setStatus(lang === 'zh' ? '书房已清空，像一张刚铺好的纸。' : 'The room is clear, like a fresh sheet of paper.')
+    await loadArchive({ seed: true })
+  }
+
+  async function handleExportData() {
+    setExportLabel(lang === 'zh' ? '整理中...' : 'Preparing...')
+    const payload = {
+      books,
+      fragments: archiveFragments,
+      imports,
+      exportedAt: new Date().toISOString(),
+    }
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `lucerna-archive-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    setExportLabel(lang === 'zh' ? '档案已导出' : 'Archive exported')
+    setTimeout(() => setExportLabel(''), 3000)
+  }
+
+  async function handleImportBackup(file: File) {
+    setImportLabel(lang === 'zh' ? '正在恢复...' : 'Restoring...')
+    try {
+      const text = await file.text()
+      const payload = JSON.parse(text)
+      if (payload.fragments && payload.books) {
+        const db = await createDatabase()
+        const repo = createRepositoryAdapter(db)
+        for (const book of payload.books) {
+          const exists = await db.books.findById(book.id)
+          if (!exists) {
+            await repo.createBook({ ...book, createdAt: new Date(book.createdAt), updatedAt: new Date() })
+          }
+        }
+        for (const fragment of payload.fragments) {
+          const exists = await db.fragments.findById(fragment.id)
+          if (!exists) {
+            await repo.createFragment({
+              ...fragment,
+              clippedAt: fragment.clippedAt ? new Date(fragment.clippedAt) : null,
+              createdAt: new Date(fragment.createdAt),
+              updatedAt: new Date(),
+            })
+          }
+        }
+        await loadArchive()
+        setImportLabel(lang === 'zh' ? '备份已恢复' : 'Backup restored')
+      }
+    } catch {
+      setImportLabel(lang === 'zh' ? '恢复失败，请检查文件' : 'Restore failed, check file')
+    }
+    setTimeout(() => setImportLabel(''), 3000)
+  }
+
   const selectedBookFragments = selectedBook
     ? sortedFragments.filter((fragment) => fragment.bookId === selectedBook.id)
     : []
@@ -280,6 +422,7 @@ function App() {
     timeline: t.timelineTitle,
     library: t.libraryTitle,
     book: selectedBook?.title ?? t.bookRoomLabel,
+    settings: lang === 'zh' ? '书房设置' : 'Room settings',
   }[page]
   const pageNote = {
     room: lang === 'zh'
@@ -297,12 +440,16 @@ function App() {
     book: lang === 'zh'
       ? '单本书的阅读房间，只保留与这本书有关的痕迹。'
       : 'A single-book room for traces belonging to this title.',
+    settings: lang === 'zh'
+      ? '调整灯光，整理书桌，安静地留在房间里。'
+      : 'Adjust the lamp, tidy the desk, stay quietly in the room.',
   }[page]
   const navigationItems = [
     ['room', t.navRoom, stats.fragments],
     ['fragments', t.navFragments, stats.highlights],
     ['library', t.navLibrary, stats.books],
     ['timeline', t.navTimeline, timelineGroups.length],
+    ['settings', t.navSettings, '・'],
   ] as const
 
   return (
@@ -340,7 +487,7 @@ function App() {
             <span>{t.captionOne}</span>
             <span>{t.captionTwo}</span>
             <span>{t.captionThree}</span>
-          </div>
+        </div>
           <div className="intro-rule bottom-rule" />
         </section>
       )}
@@ -357,7 +504,7 @@ function App() {
               </svg>
             </span>
             <span className="brand-word">Archive</span>
-          </div>
+        </div>
 
           <nav className="app-nav" aria-label="Primary navigation">
             {navigationItems.map(([id, label, count]) => (
@@ -390,8 +537,8 @@ function App() {
                 event.target.value = ''
               }}
             />
-            <button
-              type="button"
+        <button
+          type="button"
               className="language-toggle"
               onClick={() => setLang(nextLang)}
               aria-label={lang === 'zh' ? 'Switch to English' : '切换到中文'}
@@ -445,11 +592,11 @@ function App() {
                     <small>{String(index + 1).padStart(2, '0')}</small>
                     <strong>{book.title}</strong>
                     <em>{count}</em>
-                  </button>
+        </button>
                 ))}
               </div>
             </article>
-          </section>
+      </section>
 
           {page === 'room' && (
             <section className="desk-grid">
@@ -496,17 +643,17 @@ function App() {
           )}
 
           {page === 'fragments' && (
-            <section className="records-layout fragments-wall" id="fragments">
+            <section className="records-layout" id="fragments">
               <div className="record-filters" aria-label="Archive filters">
                 <span>{t.highlights}: {stats.highlights}</span>
                 <span>{t.notes}: {stats.notes}</span>
                 <span>{t.bookmarks}: {stats.bookmarks}</span>
               </div>
-              <div className="record-stream pinboard-stream">
+              <div className="record-stream">
                 {workspaceFragments.map((fragment, index) => {
                   const book = bookMap.get(fragment.bookId)
                   return (
-                    <article className="fragment-card record-card paper-slip" key={fragment.id} style={{ '--tilt': `${(index % 7) - 3}deg`, '--lift': `${(index % 4) * 18}px` } as CSSProperties}>
+                    <article className="fragment-card record-card" key={fragment.id} style={{ '--tilt': `${(index % 5) - 2}deg` } as CSSProperties}>
                       <span>{typeLabel(fragment.type, lang)} / {formatDate(fragment.clippedAt, lang)}</span>
                       <p>{fragment.content || t.noContent}</p>
                       <footer>
@@ -530,7 +677,7 @@ function App() {
                     <p>{item.fragments.length} {t.fragments}</p>
                   </article>
                 ))}
-              </div>
+        </div>
             </section>
           )}
 
@@ -550,8 +697,8 @@ function App() {
                     <em>{quote || t.noContent}</em>
                   </button>
                 ))}
-              </div>
-            </section>
+        </div>
+      </section>
           )}
 
           {page === 'book' && selectedBook && (
@@ -574,6 +721,146 @@ function App() {
                 </div>
               </div>
             </section>
+          )}
+
+          {page === 'settings' && (
+            <section className="settings" id="settings">
+              <div className="settings-grid">
+                <article className="settings-card about-card">
+                  <span className="settings-section-label">{t.aboutHeader}</span>
+                  <div className="about-body">
+                    <p>{t.aboutIntro}</p>
+                    <div className="about-meta">
+                      <div className="meta-row">
+                        <small>{t.version}</small>
+                        <strong>{t.versionNum}</strong>
+                      </div>
+                      <div className="meta-row">
+                        <small>{t.tagline}</small>
+                        <em>—</em>
+                      </div>
+                      <div className="about-divider" />
+                      <div className="meta-row">
+                        <small>{t.developer}</small>
+                        <strong>{t.developerName}</strong>
+                      </div>
+                      <div className="meta-row">
+                        <small>Email</small>
+                        <a href={`mailto:${t.developerEmail}`} className="about-link">{t.developerEmail}</a>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="settings-card">
+                  <span className="settings-section-label">{t.displaySection}</span>
+                  <div className="settings-toggle-group">
+                    <div className="settings-toggle-row">
+                      <span>{t.languageSection}</span>
+                      <div className="toggle-options">
+                        <button
+                          type="button"
+                          className={lang === 'zh' ? 'toggle-active' : ''}
+                          onClick={() => setLang('zh')}
+                        >
+                          {t.zhOption}
+                        </button>
+                        <button
+                          type="button"
+                          className={lang === 'en' ? 'toggle-active' : ''}
+                          onClick={() => setLang('en')}
+                        >
+                          {t.enOption}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="settings-toggle-row muted">
+                      <span>{t.themeSection}</span>
+                      <small>{t.themeDesc}</small>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="settings-card">
+                  <span className="settings-section-label">{t.dataSection}</span>
+                  <div className="settings-toggle-group">
+                    <div className="settings-toggle-row">
+                      <span>{t.importSection}</span>
+                      <label className="file-import-label">
+                        {importLabel || t.importData}
+                        <input
+                          type="file"
+                          accept=".json,application/json"
+                          hidden
+                          onChange={(event) => {
+                            const file = event.target.files?.[0]
+                            if (file) void handleImportBackup(file)
+                            event.target.value = ''
+                          }}
+                        />
+                      </label>
+                    </div>
+                    <div className="settings-toggle-row">
+                      <span>{t.exportSection}</span>
+                      <button type="button" className="export-btn" onClick={handleExportData}>
+                        {exportLabel || t.exportData}
+                      </button>
+                    </div>
+                    <div className="settings-toggle-row danger-row">
+                      <div>
+                        <span>{t.clearData}</span>
+                        <small>{t.clearDataDesc}</small>
+                      </div>
+                      <button
+                        type="button"
+                        className="clear-btn"
+                        onClick={() => setShowClearConfirm(true)}
+                      >
+                        {t.clearData}
+                      </button>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="settings-card stats-card">
+                  <span className="settings-section-label">{t.statsSection}</span>
+                  <div className="stats-ledger">
+                    <div className="stat-item">
+                      <strong>{stats.books}</strong>
+                      <span>{t.totalBooks}</span>
+                    </div>
+                    <div className="stat-item">
+                      <strong>{stats.fragments}</strong>
+                      <span>{t.totalFragments}</span>
+                    </div>
+                    <div className="stat-item">
+                      <strong>{imports.length}</strong>
+                      <span>{t.totalImports}</span>
+                    </div>
+                    <div className="stat-item">
+                      <strong>{latestImport ? formatDate(latestImport.importedAt, lang) : t.none}</strong>
+                      <span>{t.lastImport}</span>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+          )}
+
+          {showClearConfirm && (
+            <div className="confirm-overlay" onClick={() => setShowClearConfirm(false)}>
+              <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
+                <p>{t.clearConfirm}</p>
+                <div className="confirm-actions">
+                  <button type="button" className="clear-btn confirm-yes" onClick={handleClearData}>
+                    {t.clearYes}
+                  </button>
+                  <button type="button" className="confirm-no" onClick={() => setShowClearConfirm(false)}>
+                    {t.clearNo}
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </section>
       </div>
