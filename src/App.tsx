@@ -240,8 +240,20 @@ function App() {
 
   function openBookRoom(bookId: string) {
     setSelectedBookId(bookId)
-    setPage('book')
+    changePage('book')
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function changePage(nextPage: Page) {
+    if (nextPage === page) return
+    const transitionDocument = document as Document & {
+      startViewTransition?: (callback: () => void) => void
+    }
+    if (transitionDocument.startViewTransition) {
+      transitionDocument.startViewTransition(() => setPage(nextPage))
+      return
+    }
+    setPage(nextPage)
   }
 
   const selectedBookFragments = selectedBook
@@ -266,7 +278,7 @@ function App() {
             <button
               type="button"
               className={page === id ? 'nav-tab active' : 'nav-tab'}
-              onClick={() => setPage(id as Page)}
+              onClick={() => changePage(id as Page)}
               key={id}
             >
               {label}
@@ -418,7 +430,7 @@ function App() {
               <p>{selectedBook.author}</p>
               <strong>{selectedBookFragments.length}</strong>
               <span>{t.fragments}</span>
-              <button type="button" onClick={() => setPage('library')}>{t.navLibrary}</button>
+              <button type="button" onClick={() => changePage('library')}>{t.navLibrary}</button>
             </aside>
             <div className="book-fragment-stack">
               {selectedBookFragments.map((fragment) => (
