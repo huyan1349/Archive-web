@@ -403,7 +403,7 @@ function App() {
           <p className="import-status">{status}</p>
         </aside>
 
-        <section className="app-workspace" data-page-title={pageTitle}>
+        <section className="app-workspace" data-page={page} data-page-title={pageTitle}>
           <header className="workspace-header">
             <div>
               <p className="eyebrow">{t.eyebrow}</p>
@@ -496,17 +496,17 @@ function App() {
           )}
 
           {page === 'fragments' && (
-            <section className="records-layout" id="fragments">
+            <section className="records-layout fragments-wall" id="fragments">
               <div className="record-filters" aria-label="Archive filters">
                 <span>{t.highlights}: {stats.highlights}</span>
                 <span>{t.notes}: {stats.notes}</span>
                 <span>{t.bookmarks}: {stats.bookmarks}</span>
               </div>
-              <div className="record-stream">
+              <div className="record-stream pinboard-stream">
                 {workspaceFragments.map((fragment, index) => {
                   const book = bookMap.get(fragment.bookId)
                   return (
-                    <article className="fragment-card record-card" key={fragment.id} style={{ '--tilt': `${(index % 5) - 2}deg` } as CSSProperties}>
+                    <article className="fragment-card record-card paper-slip" key={fragment.id} style={{ '--tilt': `${(index % 7) - 3}deg`, '--lift': `${(index % 4) * 18}px` } as CSSProperties}>
                       <span>{typeLabel(fragment.type, lang)} / {formatDate(fragment.clippedAt, lang)}</span>
                       <p>{fragment.content || t.noContent}</p>
                       <footer>
@@ -521,7 +521,7 @@ function App() {
           )}
 
           {page === 'timeline' && (
-            <section className="timeline app-timeline" id="timeline">
+            <section className="timeline app-timeline timeline-scroll" id="timeline">
               <div className="timeline-list">
                 {timelineGroups.map((item) => (
                   <article className="timeline-item" key={item.label}>
@@ -535,7 +535,7 @@ function App() {
           )}
 
           {page === 'library' && (
-            <section className="library app-library" id="library">
+            <section className="library app-library library-shelf" id="library">
               <div className="library-panel library-catalog">
                 {bookSummaries.map(({ book, count, latest, quote }, index) => (
                   <button
@@ -555,7 +555,7 @@ function App() {
           )}
 
           {page === 'book' && selectedBook && (
-            <section className="book-room app-book-room">
+            <section className="book-room app-book-room book-spread">
               <div className="book-room-layout">
                 <aside className="book-room-index">
                   <p>{selectedBook.author}</p>
