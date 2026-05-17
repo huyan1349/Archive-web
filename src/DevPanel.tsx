@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { createDatabase, createRepositoryAdapter, importClippings, seedIfNeeded } from './core'
+import { createDatabase, createRepositoryAdapter, importClippings, seedIfNeeded, WeReadClient, syncAllBooks, importWeReadBooks } from './core'
+import type { WeReadSyncProgress } from './core'
 
 type DevStatus = 'idle' | 'loading' | 'success' | 'error'
 
@@ -7,6 +8,9 @@ export default function DevPanel() {
   const [status, setStatus] = useState<DevStatus>('idle')
   const [message, setMessage] = useState('')
   const [expanded, setExpanded] = useState(false)
+  const [wereadExpanded, setWereadExpanded] = useState(false)
+  const [wereadCookie, setWereadCookie] = useState('')
+  const [wereadProgress, setWereadProgress] = useState<WeReadSyncProgress | null>(null)
 
   async function handleSeed() {
     setStatus('loading')
@@ -82,6 +86,73 @@ export default function DevPanel() {
     }
   }
 
+  async function handleWeReadValidate() {
+    if (!wereadCookie.trim()) {
+      setStatus('error')
+      setMessage('Please paste your WeRead cookie first')
+      return
+    }
+    setStatus('loading')
+    setMessage('')
+    try {
+      const client = new WeReadClient(wereadCookie.trim())
+      const valid = await client.validate()
+      if (valid) {
+        setStatus('success')
+        setMessage('Cookie valid! Ready to sync.')
+      } else {
+        setStatus('error')
+        setMessage('Cookie invalid or expired. Please re-login to weread.qq.com')
+      }
+    } catch (e) {
+      setStatus('error')
+      setMessage(e instanceof Error ? e.message : 'Validation failed')
+    }
+  }
+
+  async function handleWeReadSync() {
+    if (!wereadCookie.trim()) {
+      setStatus('error')
+      setMessage('Please paste your WeRead cookie first')
+      return
+    }
+    setStatus('loading')
+    setMessage('')
+    setWereadProgress(null)
+    try {
+      const { books: booksData, errors: syncErrors } = await syncAllBooks(
+        wereadCookie.trim(),
+        (progress) => setWereadProgress(progress),
+      )
+
+      if (booksData.length === 0) {
+        setStatus('error')
+        setMessage(syncErrors.length > 0 ? syncErrors.join('; ') : 'No books with notes found')
+        return
+      }
+
+      const db = await createDatabase()
+      const repo = createRepositoryAdapter(db)
+      const result = await importWeReadBooks(booksData, repo, syncErrors)
+
+      setStatus('success')
+      const parts = [
+        `${result.stats.totalBooks} books synced`,
+        `${result.stats.totalHighlights} highlights`,
+        `${result.stats.totalNotes} notes`,
+        `${result.stats.totalReviews} reviews`,
+        `${result.skippedCount} duplicates skipped`,
+      ]
+      if (result.errors.length > 0) {
+        parts.push(`${result.errors.length} errors`)
+      }
+      setMessage(parts.join(' | '))
+    } catch (e) {
+      setStatus('error')
+      setMessage(e instanceof Error ? e.message : 'Sync failed')
+    }
+  }
+
   return (
     <div style={{
       position: 'fixed',
@@ -98,7 +169,8 @@ export default function DevPanel() {
           borderRadius: 12,
           padding: 16,
           marginBottom: 8,
-          minWidth: 280,
+          minWidth: 320,
+          maxWidth: 400,
           color: '#f3ead6',
         }}>
           <div style={{ marginBottom: 8, color: '#e9b96f', fontWeight: 600, letterSpacing: '0.1em' }}>
@@ -117,6 +189,58 @@ export default function DevPanel() {
             <button onClick={handleClear} style={{ ...btnStyle, borderColor: 'rgba(220,80,80,0.5)' }}>
               Clear Database
             </button>
+
+            <div style={{ borderTop: '1px solid rgba(233,185,111,0.15)', margin: '4px 0' }} />
+
+            <button
+              onClick={() => setWereadExpanded(!wereadExpanded)}
+              style={{ ...btnStyle, color: wereadExpanded ? '#e9b96f' : '#f3ead6' }}
+            >
+              {wereadExpanded ? '▼' : '▶'} Sync WeRead (微信读书)
+            </button>
+
+            {wereadExpanded && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingLeft: 8 }}>
+                <div style={{ color: '#8a7e6e', fontSize: 11, lineHeight: 1.4 }}>
+                  1. Open weread.qq.com and login
+                  <br />
+                  2. F12 → Application → Cookies → Copy all
+                  <br />
+                  3. Paste below and click Validate, then Sync
+                </div>
+                <textarea
+                  value={wereadCookie}
+                  onChange={(e) => setWereadCookie(e.target.value)}
+                  placeholder="Paste your WeRead cookie here..."
+                  style={{
+                    width: '100%',
+                    height: 60,
+                    padding: 6,
+                    borderRadius: 6,
+                    border: '1px solid rgba(233,185,111,0.25)',
+                    background: 'rgba(233,185,111,0.05)',
+                    color: '#f3ead6',
+                    fontFamily: 'monospace',
+                    fontSize: 10,
+                    resize: 'vertical',
+                    outline: 'none',
+                  }}
+                />
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button onClick={handleWeReadValidate} disabled={status === 'loading'} style={btnStyle}>
+                    Validate
+                  </button>
+                  <button onClick={handleWeReadSync} disabled={status === 'loading'} style={{ ...btnStyle, borderColor: 'rgba(100,180,100,0.4)' }}>
+                    Sync All
+                  </button>
+                </div>
+                {wereadProgress && wereadProgress.phase !== 'done' && (
+                  <div style={{ color: '#8a7e6e', fontSize: 10 }}>
+                    {wereadProgress.phase} [{wereadProgress.current}/{wereadProgress.total}] {wereadProgress.bookTitle}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           {message && (
             <div style={{

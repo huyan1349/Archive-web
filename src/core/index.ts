@@ -9,6 +9,7 @@
  *   database/   — 数据库抽象层（当前 IndexedDB，后续可换 SQLite）
  *   kindle-db/  — Kindle 设备 SQLite 数据库解析（vocab.db 查词 / cc.db 书籍元数据）
  *   analysis/   — 数据分析引擎（阅读天气 / 阅读基因 / 午夜回响 / 跨书关联 / 阅读年信 / 阅读会话）
+ *   weread/    — 微信读书导入（Cookie 认证 → API 拉取 → 转换写入）
  *   auth/       — 认证模块（Supabase 邮箱+密码 / Magic Link）
  *
  * 前端使用方式：
@@ -50,3 +51,7 @@ export type { ReadingLetter, LetterParagraph, LetterStats, LetterMilestone } fro
 export { isSupabaseConfigured } from './auth'
 export { signUpWithEmail, loginWithEmail, sendMagicLink, logout, getCurrentSession, getCurrentUser, onAuthStateChange } from './auth'
 export type { AuthUser, AuthSession, AuthMode, AuthState, AuthError, SignUpResult, LoginResult, MagicLinkResult } from './auth'
+
+export { WeReadClient, syncAllBooks, importWeReadBooks } from './weread'
+export type { WeReadSyncProgress, WeReadBookData, WeReadImportResult } from './weread'
+export type { WeReadNotebook, WeReadBookMeta, WeReadBookmark, WeReadReview, WeReadChapterInfo, WeReadReadInfo, WeReadSyncResult } from './weread'

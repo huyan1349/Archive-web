@@ -1,6 +1,8 @@
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import DevPanel from './DevPanel'
+import AuthForm from './AuthForm'
+import { useAuth } from './AuthProvider'
 import {
   createDatabase,
   createRepositoryAdapter,
@@ -278,6 +280,7 @@ function App() {
   const [page, setPage] = useState<Page>('room')
   const [showIntro, setShowIntro] = useState(true)
   const [introPage, setIntroPage] = useState(0)
+  const { user, configured: authConfigured, logout } = useAuth()
 
   useEffect(() => {
     if (showIntro) {
@@ -587,17 +590,20 @@ function App() {
                 <span>{t.captionThree}</span>
               </div>
               <div className="intro-rule bottom-rule" />
-              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(1)} aria-label={t.nextLabel}>
-                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
-              </button>
+              <div className="intro-actions">
+                <button type="button" onClick={() => setIntroPage(1)}>{t.nextLabel}</button>
+                <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
+                  {lang === 'zh' ? 'English' : '中文'}
+                </button>
+              </div>
             </>
           )}
 
           {introPage === 1 && (
             <>
               <div className="intro-rule top-rule" />
-              <div className="intro-hero intro-hero-tutor">
-                <div>
+              <div className="intro-hero intro-hero-room-demo">
+                <div className="room-demo-text">
                   <p className="eyebrow"><mark>{t.tutorialRoomLabel}</mark></p>
                   <h1>{t.tutorialRoomTitle}</h1>
                   <p className="tutor-desc">
@@ -605,37 +611,34 @@ function App() {
                     {t.tutorialRoomDesc2}<br />
                     <mark>{t.tutorialRoomDesc3}</mark>
                   </p>
+                  <div className="intro-actions">
+                    <button type="button" onClick={() => setIntroPage(2)}>{t.nextLabel}</button>
+                    <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
+                      {lang === 'zh' ? 'English' : '中文'}
+                    </button>
+                  </div>
                 </div>
-                <div className="tutor-drawing" aria-hidden="true">
-                  <svg viewBox="0 0 320 340" className="tutor-svg">
-                    <rect x="30" y="40" width="260" height="220" rx="6" fill="rgba(247,237,218,0.7)" stroke="rgba(35,27,19,0.5)" strokeWidth="2" strokeDasharray="1200" />
-                    <path d="M 30 70 L 290 70" fill="none" stroke="rgba(35,27,19,0.28)" strokeWidth="1.2" strokeDasharray="500" />
-                    <rect x="44" y="90" width="60" height="80" rx="3" fill="rgba(255,255,255,0.6)" stroke="rgba(35,27,19,0.22)" strokeWidth="1.5" strokeDasharray="300" />
-                    <line x1="74" y1="110" x2="74" y2="145" stroke="rgba(35,27,19,0.15)" strokeWidth="4" strokeDasharray="50" />
-                    <rect x="118" y="86" width="70" height="88" rx="3" fill="rgba(255,255,255,0.5)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.5" strokeDasharray="320" />
-                    <line x1="153" y1="100" x2="153" y2="148" stroke="rgba(159,79,45,0.18)" strokeWidth="5" strokeDasharray="60" />
-                    <rect x="202" y="92" width="56" height="76" rx="3" fill="rgba(255,255,255,0.55)" stroke="rgba(35,27,19,0.18)" strokeWidth="1.5" strokeDasharray="280" />
-                    <line x1="230" y1="108" x2="230" y2="140" stroke="rgba(35,27,19,0.16)" strokeWidth="3" strokeDasharray="45" />
-                    <path d="M 70 210 C 120 190, 180 220, 250 200" fill="none" stroke="rgba(159,79,45,0.18)" strokeWidth="1.8" strokeDasharray="300" />
-                    <circle cx="60" cy="260" r="3" fill="rgba(159,79,45,0.22)" />
-                    <circle cx="160" cy="275" r="4.5" fill="rgba(35,27,19,0.16)" />
-                    <circle cx="260" cy="250" r="3.5" fill="rgba(159,79,45,0.18)" />
-                    <path d="M 40 290 C 90 310, 200 270, 270 300" fill="none" stroke="rgba(35,27,19,0.08)" strokeWidth="1" strokeDasharray="6 8" />
-                  </svg>
+                <div className="room-demo-stage" aria-hidden="true">
+                  <div className="room-demo-desk">
+                    <div className="rdd-shelf" />
+                    <div className="rdd-book rdd-b1" />
+                    <div className="rdd-book rdd-b2" />
+                    <div className="rdd-book rdd-b3" />
+                    <div className="rdd-lamp"><div className="rdd-lamp-shade" /><div className="rdd-lamp-base" /></div>
+                    <div className="rdd-mug" />
+                    <div className="rdd-ink-blot" />
+                  </div>
                 </div>
               </div>
               <div className="intro-rule bottom-rule" />
-              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(2)} aria-label={t.nextLabel}>
-                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
-              </button>
             </>
           )}
 
           {introPage === 2 && (
             <>
               <div className="intro-rule top-rule" />
-              <div className="intro-hero intro-hero-tutor">
-                <div>
+              <div className="intro-hero intro-hero-frag-demo">
+                <div className="frag-demo-text">
                   <p className="eyebrow"><mark>{t.tutorialFragLabel}</mark></p>
                   <h1>{t.tutorialFragTitle}</h1>
                   <p className="tutor-desc">
@@ -643,40 +646,30 @@ function App() {
                     {t.tutorialFragDesc2}<br />
                     <mark>{t.tutorialFragDesc3}</mark>
                   </p>
+                  <div className="intro-actions">
+                    <button type="button" onClick={() => setIntroPage(3)}>{t.nextLabel}</button>
+                    <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
+                      {lang === 'zh' ? 'English' : '中文'}
+                    </button>
+                  </div>
                 </div>
-                <div className="tutor-drawing" aria-hidden="true">
-                  <svg viewBox="0 0 320 340" className="tutor-svg">
-                    <rect x="50" y="30" width="80" height="100" rx="2" fill="rgba(255,255,255,0.7)" stroke="rgba(35,27,19,0.38)" strokeWidth="1.6" transform="rotate(-4, 90, 80)" strokeDasharray="320" />
-                    <line x1="60" y1="50" x2="118" y2="50" stroke="rgba(35,27,19,0.14)" strokeWidth="3" transform="rotate(-4, 90, 80)" strokeDasharray="120" />
-                    <line x1="60" y1="64" x2="110" y2="64" stroke="rgba(35,27,19,0.1)" strokeWidth="2.5" transform="rotate(-4, 90, 80)" strokeDasharray="100" />
-                    <line x1="60" y1="78" x2="106" y2="78" stroke="rgba(35,27,19,0.08)" strokeWidth="2" transform="rotate(-4, 90, 80)" strokeDasharray="90" />
-                    <rect x="170" y="50" width="90" height="110" rx="2" fill="rgba(255,255,255,0.65)" stroke="rgba(159,79,45,0.32)" strokeWidth="1.6" transform="rotate(6, 215, 105)" strokeDasharray="360" />
-                    <line x1="182" y1="70" x2="246" y2="70" stroke="rgba(159,79,45,0.12)" strokeWidth="3" transform="rotate(6, 215, 105)" strokeDasharray="130" />
-                    <line x1="182" y1="85" x2="238" y2="85" stroke="rgba(159,79,45,0.1)" strokeWidth="2.5" transform="rotate(6, 215, 105)" strokeDasharray="110" />
-                    <line x1="182" y1="100" x2="230" y2="100" stroke="rgba(159,79,45,0.08)" strokeWidth="2" transform="rotate(6, 215, 105)" strokeDasharray="95" />
-                    <rect x="100" y="180" width="100" height="120" rx="2" fill="rgba(255,255,255,0.6)" stroke="rgba(35,27,19,0.7)" strokeWidth="1.8" transform="rotate(-7, 150, 240)" strokeDasharray="400" />
-                    <line x1="114" y1="200" x2="186" y2="200" stroke="rgba(35,27,19,0.18)" strokeWidth="3.5" transform="rotate(-7, 150, 240)" strokeDasharray="140" />
-                    <line x1="114" y1="218" x2="176" y2="218" stroke="rgba(35,27,19,0.12)" strokeWidth="2.5" transform="rotate(-7, 150, 240)" strokeDasharray="120" />
-                    <line x1="114" y1="236" x2="168" y2="236" stroke="rgba(35,27,19,0.1)" strokeWidth="2" transform="rotate(-7, 150, 240)" strokeDasharray="110" />
-                    <path d="M 60 240 C 80 220, 120 250, 90 270" fill="none" stroke="rgba(159,79,45,0.16)" strokeWidth="1.4" strokeDasharray="80" />
-                    <path d="M 220 230 C 240 210, 280 240, 250 260" fill="none" stroke="rgba(35,27,19,0.12)" strokeWidth="1.4" strokeDasharray="80" />
-                    <circle cx="50" cy="300" r="4" fill="rgba(159,79,45,0.18)" />
-                    <circle cx="260" cy="310" r="5" fill="rgba(35,27,19,0.14)" />
-                  </svg>
+                <div className="frag-demo-stage" aria-hidden="true">
+                  <div className="frag-slip fs-1"><div className="fs-line" /><div className="fs-line short" /><div className="fs-line" /></div>
+                  <div className="frag-slip fs-2"><div className="fs-line" /><div className="fs-line short" /></div>
+                  <div className="frag-slip fs-3"><div className="fs-line" /><div className="fs-line" /><div className="fs-line short" /></div>
+                  <div className="frag-slip fs-4"><div className="fs-line short" /><div className="fs-line" /></div>
+                  <div className="frag-slip fs-5"><div className="fs-line" /><div className="fs-line short" /><div className="fs-line" /></div>
                 </div>
               </div>
               <div className="intro-rule bottom-rule" />
-              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(3)} aria-label={t.nextLabel}>
-                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
-              </button>
             </>
           )}
 
           {introPage === 3 && (
             <>
               <div className="intro-rule top-rule" />
-              <div className="intro-hero intro-hero-tutor">
-                <div>
+              <div className="intro-hero intro-hero-tl-demo">
+                <div className="tl-demo-text">
                   <p className="eyebrow"><mark>{t.tutorialTimelineLabel}</mark></p>
                   <h1>{t.tutorialTimelineTitle}</h1>
                   <p className="tutor-desc">
@@ -684,42 +677,33 @@ function App() {
                     {t.tutorialTimelineDesc2}<br />
                     <mark>{t.tutorialTimelineDesc3}</mark>
                   </p>
+                  <div className="intro-actions">
+                    <button type="button" onClick={() => setIntroPage(4)}>{t.nextLabel}</button>
+                    <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
+                      {lang === 'zh' ? 'English' : '中文'}
+                    </button>
+                  </div>
                 </div>
-                <div className="tutor-drawing" aria-hidden="true">
-                  <svg viewBox="0 0 320 340" className="tutor-svg">
-                    <path d="M 40 80 C 80 140, 120 40, 160 100 C 200 160, 240 60, 280 120" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="800" />
-                    <path d="M 40 80 C 80 140, 120 40, 160 100 C 200 160, 240 60, 280 120" fill="none" stroke="rgba(159,79,45,0.16)" strokeWidth="12" strokeLinecap="round" opacity="0.5" />
-                    <rect x="52" y="72" width="56" height="42" rx="3" fill="rgba(255,255,255,0.75)" stroke="rgba(35,27,19,0.28)" strokeWidth="1.3" strokeDasharray="200" />
-                    <line x1="62" y1="82" x2="96" y2="82" stroke="rgba(35,27,19,0.16)" strokeWidth="2.5" strokeDasharray="70" />
-                    <line x1="62" y1="92" x2="86" y2="92" stroke="rgba(35,27,19,0.1)" strokeWidth="2" strokeDasharray="50" />
-                    <rect x="138" y="96" width="48" height="36" rx="3" fill="rgba(255,255,255,0.7)" stroke="rgba(159,79,45,0.26)" strokeWidth="1.3" strokeDasharray="180" />
-                    <line x1="146" y1="106" x2="176" y2="106" stroke="rgba(159,79,45,0.16)" strokeWidth="2" strokeDasharray="60" />
-                    <rect x="105" y="150" width="66" height="44" rx="3" fill="rgba(255,255,255,0.72)" stroke="rgba(35,27,19,0.24)" strokeWidth="1.3" strokeDasharray="210" />
-                    <line x1="115" y1="162" x2="160" y2="162" stroke="rgba(35,27,19,0.14)" strokeWidth="2.5" strokeDasharray="80" />
-                    <line x1="115" y1="172" x2="148" y2="172" stroke="rgba(35,27,19,0.1)" strokeWidth="2" strokeDasharray="60" />
-                    <rect x="210" y="116" width="60" height="38" rx="3" fill="rgba(255,255,255,0.76)" stroke="rgba(159,79,45,0.28)" strokeWidth="1.3" strokeDasharray="200" />
-                    <line x1="220" y1="128" x2="258" y2="128" stroke="rgba(159,79,45,0.14)" strokeWidth="2.5" strokeDasharray="70" />
-                    <rect x="240" y="62" width="48" height="34" rx="3" fill="rgba(255,255,255,0.68)" stroke="rgba(35,27,19,0.26)" strokeWidth="1.3" strokeDasharray="180" />
-                    <circle cx="80" cy="140" r="4.5" fill="rgba(159,79,45,0.2)" />
-                    <circle cx="162" cy="250" r="5" fill="rgba(35,27,19,0.16)" />
-                    <circle cx="250" cy="200" r="4" fill="rgba(159,79,45,0.18)" />
-                    <circle cx="120" cy="280" r="3.5" fill="rgba(35,27,19,0.14)" />
-                    <path d="M 30 290 Q 160 310, 290 285" fill="none" stroke="rgba(35,27,19,0.08)" strokeWidth="1" strokeDasharray="5 10" />
+                <div className="tl-demo-stage" aria-hidden="true">
+                  <svg viewBox="0 0 300 360" className="tl-river-svg">
+                    <path className="tl-river-bg" d="M 150 20 C 100 80, 200 120, 140 180 C 80 240, 180 280, 150 340" fill="none" stroke="rgba(159,79,45,0.14)" strokeWidth="18" strokeLinecap="round" />
+                    <path className="tl-river-line" d="M 150 20 C 100 80, 200 120, 140 180 C 80 240, 180 280, 150 340" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="800" />
                   </svg>
+                  <div className="tl-demo-card tlc-1" />
+                  <div className="tl-demo-card tlc-2" />
+                  <div className="tl-demo-card tlc-3" />
+                  <div className="tl-demo-card tlc-4" />
                 </div>
               </div>
               <div className="intro-rule bottom-rule" />
-              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(4)} aria-label={t.nextLabel}>
-                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
-              </button>
             </>
           )}
 
           {introPage === 4 && (
             <>
               <div className="intro-rule top-rule" />
-              <div className="intro-hero intro-hero-tutor">
-                <div>
+              <div className="intro-hero intro-hero-lib-demo">
+                <div className="lib-demo-text">
                   <p className="eyebrow"><mark>{t.tutorialLibLabel}</mark></p>
                   <h1>{t.tutorialLibTitle}</h1>
                   <p className="tutor-desc">
@@ -727,47 +711,39 @@ function App() {
                     {t.tutorialLibDesc2}<br />
                     <mark>{t.tutorialLibDesc3}</mark>
                   </p>
+                  <div className="intro-actions">
+                    <button type="button" onClick={() => setIntroPage(5)}>{t.nextLabel}</button>
+                    <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
+                      {lang === 'zh' ? 'English' : '中文'}
+                    </button>
+                  </div>
                 </div>
-                <div className="tutor-drawing" aria-hidden="true">
-                  <svg viewBox="0 0 320 340" className="tutor-svg">
-                    <rect x="20" y="50" width="50" height="200" rx="3" fill="rgba(255,255,255,0.6)" stroke="rgba(35,27,19,0.38)" strokeWidth="1.6" strokeDasharray="480" />
-                    <rect x="30" y="60" width="30" height="40" rx="2" fill="rgba(159,79,45,0.15)" stroke="rgba(159,79,45,0.28)" strokeWidth="1.2" strokeDasharray="140" />
-                    <rect x="30" y="108" width="30" height="34" rx="2" fill="rgba(35,27,19,0.12)" stroke="rgba(35,27,19,0.22)" strokeWidth="1.2" strokeDasharray="130" />
-                    <rect x="30" y="150" width="30" height="36" rx="2" fill="rgba(159,79,45,0.1)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.2" strokeDasharray="130" />
-                    <rect x="90" y="40" width="55" height="210" rx="3" fill="rgba(255,255,255,0.55)" stroke="rgba(35,27,19,0.5)" strokeWidth="1.8" strokeDasharray="500" />
-                    <rect x="102" y="52" width="32" height="44" rx="2" fill="rgba(35,27,19,0.14)" stroke="rgba(35,27,19,0.26)" strokeWidth="1.2" strokeDasharray="150" />
-                    <rect x="102" y="104" width="32" height="36" rx="2" fill="rgba(159,79,45,0.18)" stroke="rgba(159,79,45,0.28)" strokeWidth="1.2" strokeDasharray="140" />
-                    <rect x="102" y="148" width="32" height="40" rx="2" fill="rgba(35,27,19,0.1)" stroke="rgba(35,27,19,0.2)" strokeWidth="1.2" strokeDasharray="140" />
-                    <rect x="102" y="196" width="32" height="34" rx="2" fill="rgba(159,79,45,0.12)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.2" strokeDasharray="130" />
-                    <rect x="165" y="34" width="58" height="216" rx="3" fill="rgba(255,255,255,0.58)" stroke="rgba(35,27,19,0.44)" strokeWidth="1.7" strokeDasharray="520" />
-                    <rect x="178" y="46" width="34" height="46" rx="2" fill="rgba(159,79,45,0.14)" stroke="rgba(159,79,45,0.26)" strokeWidth="1.2" strokeDasharray="150" />
-                    <rect x="178" y="100" width="34" height="38" rx="2" fill="rgba(35,27,19,0.12)" stroke="rgba(35,27,19,0.22)" strokeWidth="1.2" strokeDasharray="140" />
-                    <rect x="178" y="146" width="34" height="42" rx="2" fill="rgba(159,79,45,0.16)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.2" strokeDasharray="150" />
-                    <rect x="178" y="196" width="34" height="34" rx="2" fill="rgba(35,27,19,0.08)" stroke="rgba(35,27,19,0.2)" strokeWidth="1.2" strokeDasharray="130" />
-                    <rect x="245" y="46" width="50" height="204" rx="3" fill="rgba(255,255,255,0.52)" stroke="rgba(159,79,45,0.36)" strokeWidth="1.5" strokeDasharray="480" />
-                    <rect x="256" y="58" width="30" height="38" rx="2" fill="rgba(35,27,19,0.12)" stroke="rgba(35,27,19,0.22)" strokeWidth="1.2" strokeDasharray="130" />
-                    <rect x="256" y="104" width="30" height="42" rx="2" fill="rgba(159,79,45,0.14)" stroke="rgba(159,79,45,0.24)" strokeWidth="1.2" strokeDasharray="140" />
-                    <rect x="256" y="154" width="30" height="36" rx="2" fill="rgba(35,27,19,0.1)" stroke="rgba(35,27,19,0.2)" strokeWidth="1.2" strokeDasharray="130" />
-                    <path d="M 20 250 H 295" fill="none" stroke="rgba(35,27,19,0.3)" strokeWidth="2.5" strokeDasharray="500" />
-                    <circle cx="55" cy="280" r="4" fill="rgba(159,79,45,0.2)" />
-                    <circle cx="145" cy="300" r="3.5" fill="rgba(35,27,19,0.14)" />
-                    <circle cx="225" cy="285" r="5" fill="rgba(159,79,45,0.16)" />
-                    <path d="M 20 310 Q 160 330, 300 305" fill="none" stroke="rgba(35,27,19,0.06)" strokeWidth="1" strokeDasharray="6 8" />
-                  </svg>
+                <div className="lib-demo-stage" aria-hidden="true">
+                  <div className="lib-shelf">
+                    <div className="lib-shelf-row">
+                      <div className="lib-spine ls-1" /><div className="lib-spine ls-2" /><div className="lib-spine ls-3" /><div className="lib-spine ls-4" /><div className="lib-spine ls-5" />
+                    </div>
+                    <div className="lib-shelf-board" />
+                    <div className="lib-shelf-row">
+                      <div className="lib-spine ls-6" /><div className="lib-spine ls-7" /><div className="lib-spine ls-8" /><div className="lib-spine ls-9" />
+                    </div>
+                    <div className="lib-shelf-board" />
+                    <div className="lib-shelf-row">
+                      <div className="lib-spine ls-10" /><div className="lib-spine ls-11" /><div className="lib-spine ls-12" /><div className="lib-spine ls-13" /><div className="lib-spine ls-14" />
+                    </div>
+                    <div className="lib-shelf-board" />
+                  </div>
                 </div>
               </div>
               <div className="intro-rule bottom-rule" />
-              <button type="button" className="intro-next-arrow" onClick={() => setIntroPage(5)} aria-label={t.nextLabel}>
-                <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23" fill="none" stroke="rgba(35,27,19,0.42)" strokeWidth="1.8" strokeDasharray="160" /><path d="M 22 18 L 32 26 L 22 34" fill="none" stroke="rgba(35,27,19,0.48)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
-              </button>
             </>
           )}
 
           {introPage === 5 && (
             <>
               <div className="intro-rule top-rule" />
-              <div className="intro-hero intro-hero-tutor">
-                <div>
+              <div className="intro-hero intro-hero-start-demo">
+                <div className="start-demo-text">
                   <p className="eyebrow"><mark>{t.tutorialStartLabel}</mark></p>
                   <h1>{t.tutorialStartTitle}</h1>
                   <p className="tutor-desc">
@@ -783,24 +759,22 @@ function App() {
                     </button>
                   </div>
                 </div>
-                <div className="tutor-drawing" aria-hidden="true">
-                  <svg viewBox="0 0 320 340" className="tutor-svg">
-                    <rect x="40" y="30" width="240" height="180" rx="5" fill="rgba(255,255,255,0.65)" stroke="rgba(35,27,19,0.42)" strokeWidth="2" strokeDasharray="900" />
-                    <path d="M 50 60 L 270 60" fill="none" stroke="rgba(159,79,45,0.2)" strokeWidth="1.5" strokeDasharray="400" />
-                    <line x1="72" y1="88" x2="72" y2="148" stroke="rgba(35,27,19,0.1)" strokeWidth="7" strokeDasharray="70" />
-                    <line x1="112" y1="88" x2="112" y2="122" stroke="rgba(159,79,45,0.14)" strokeWidth="6" strokeDasharray="50" />
-                    <line x1="152" y1="88" x2="152" y2="152" stroke="rgba(35,27,19,0.08)" strokeWidth="8" strokeDasharray="80" />
-                    <line x1="192" y1="88" x2="192" y2="118" stroke="rgba(159,79,45,0.12)" strokeWidth="5" strokeDasharray="45" />
-                    <line x1="232" y1="88" x2="232" y2="140" stroke="rgba(35,27,19,0.09)" strokeWidth="6" strokeDasharray="65" />
-                    <path d="M 50 166 Q 160 156, 270 166" fill="none" stroke="rgba(35,27,19,0.12)" strokeWidth="1.2" strokeDasharray="200" />
-                    <path d="M 80 230 C 110 200, 150 250, 180 220 C 200 205, 220 240, 250 225" fill="none" stroke="rgba(35,27,19,0.18)" strokeWidth="2" strokeLinecap="round" strokeDasharray="300" />
-                    <path d="M 80 250 L 80 310" fill="none" stroke="rgba(159,79,45,0.16)" strokeWidth="1.2" strokeDasharray="4 6" />
-                    <path d="M 180 240 L 180 310" fill="none" stroke="rgba(35,27,19,0.12)" strokeWidth="1.2" strokeDasharray="4 6" />
-                    <circle cx="55" cy="54" r="5.5" fill="rgba(159,79,45,0.2)" />
-                    <circle cx="265" cy="54" r="5.5" fill="rgba(159,79,45,0.2)" />
-                    <circle cx="80" cy="295" r="4.5" fill="rgba(159,79,45,0.16)" />
-                    <circle cx="180" cy="300" r="5" fill="rgba(35,27,19,0.14)" />
-                  </svg>
+                <div className="start-demo-stage" aria-hidden="true">
+                  <div className="import-doc">
+                    <div className="import-fold" />
+                    <div className="import-lines">
+                      <div className="imp-line" /><div className="imp-line short" /><div className="imp-line" /><div className="imp-line short" />
+                    </div>
+                  </div>
+                  <div className="import-arrow">
+                    <svg viewBox="0 0 40 60"><path d="M 20 8 L 20 48" fill="none" stroke="rgba(35,27,19,0.5)" strokeWidth="2" strokeLinecap="round" strokeDasharray="60" /><path d="M 12 40 L 20 50 L 28 40" fill="none" stroke="rgba(35,27,19,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /></svg>
+                  </div>
+                  <div className="import-box">
+                    <div className="import-box-icon">
+                      <svg viewBox="0 0 32 32"><path d="M 8 20 L 16 12 L 24 20" fill="none" stroke="rgba(159,79,45,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="40" /><path d="M 4 24 H 28" fill="none" stroke="rgba(159,79,45,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="40" /></svg>
+                    </div>
+                    <div className="import-box-label" />
+                  </div>
                 </div>
               </div>
               <div className="intro-rule bottom-rule" />
@@ -1300,6 +1274,26 @@ function App() {
                     </div>
                   </div>
                 </article>
+
+                {authConfigured && (
+                  <article className="settings-card">
+                    <span className="settings-section-label">
+                      {lang === 'zh' ? '账户' : 'Account'}
+                    </span>
+                    <div className="settings-toggle-group">
+                      {user ? (
+                        <div className="auth-user-badge">
+                          <span className="auth-email">{user.email}</span>
+                          <button type="button" className="auth-logout" onClick={logout}>
+                            {lang === 'zh' ? '登出' : 'Log out'}
+                          </button>
+                        </div>
+                      ) : (
+                        <AuthForm lang={lang} />
+                      )}
+                    </div>
+                  </article>
+                )}
 
                 <article className="settings-card">
                   <span className="settings-section-label">{t.displaySection}</span>
