@@ -99,6 +99,23 @@
   text-transform: uppercase;
 }
 
+.archive-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: clamp(10px, 2vw, 24px) clamp(10px, 2vw, 24px) 0;
+  padding: 18px clamp(18px, 4vw, 46px);
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, rgba(35, 27, 19, 0.04) 1px, transparent 1px) 0 0 / 42px 100%,
+    rgba(247, 237, 218, 0.92);
+  backdrop-filter: blur(3px);
+}
+
 .brand,
 .nav-links {
   display: flex;
@@ -126,14 +143,30 @@
   gap: clamp(12px, 2vw, 28px);
 }
 
-.nav-links a,
+.nav-tab,
 .language-toggle {
   transition: color 200ms ease;
 }
 
-.nav-links a:hover,
+.nav-tab:hover,
 .language-toggle:hover {
   color: var(--rust);
+}
+
+.nav-tab {
+  border: 0;
+  padding: 0;
+  color: var(--soft-ink);
+  background: transparent;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.nav-tab.active {
+  color: var(--rust);
+  text-decoration: underline;
+  text-underline-offset: 5px;
 }
 
 .language-toggle {
@@ -222,6 +255,12 @@
   transform: rotate(-0.5deg);
 }
 
+.hero-actions .secondary-action {
+  color: var(--ink);
+  background: transparent;
+  box-shadow: 4px 4px 0 rgba(159, 79, 45, 0.18);
+}
+
 .hero-actions button::after {
   content: '';
   position: absolute;
@@ -236,6 +275,31 @@
   font-family: var(--serif);
   font-size: 18px;
   font-style: italic;
+}
+
+.archive-stats {
+  display: grid;
+  grid-template-columns: repeat(4, auto 1fr);
+  gap: 4px 8px;
+  max-width: 720px;
+  margin-top: 38px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--soft-ink);
+  align-items: baseline;
+}
+
+.archive-stats strong {
+  color: var(--rust);
+  font-family: var(--serif);
+  font-size: clamp(28px, 3vw, 46px);
+  font-weight: 400;
+}
+
+.archive-stats span {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .room-card {
@@ -366,6 +430,11 @@
   margin-inline: auto;
 }
 
+.fragment-grid.expanded {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
+}
+
 .fragment-card {
   min-height: 380px;
   display: flex;
@@ -490,15 +559,115 @@
   border-bottom: 1px solid var(--line);
 }
 
-.library-panel span {
+.library-panel button {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 22px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  background: transparent;
+  text-align: left;
+}
+
+.library-panel span,
+.library-panel button span {
   font-family: var(--serif);
   font-size: clamp(26px, 3vw, 44px);
   letter-spacing: -0.05em;
 }
 
-.library-panel small {
+.library-panel small,
+.library-panel button small,
+.library-note {
   color: var(--soft-ink);
   align-self: end;
+}
+
+.library-note {
+  max-width: 420px;
+  margin-top: 22px;
+  font-family: var(--serif);
+  font-style: italic;
+}
+
+.book-room {
+  min-height: calc(100vh - 118px);
+  padding: clamp(72px, 10vw, 140px) clamp(20px, 5vw, 72px);
+  border-top: 1px solid var(--line);
+}
+
+.book-room-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 76px);
+  max-width: 1540px;
+  margin-inline: auto;
+}
+
+.book-room-index {
+  position: sticky;
+  top: 120px;
+  align-self: start;
+  display: grid;
+  gap: 10px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: #f2dfb9;
+  box-shadow: 7px 8px 0 rgba(35, 27, 19, 0.1);
+}
+
+.book-room-index p {
+  color: var(--soft-ink);
+}
+
+.book-room-index strong {
+  font-family: var(--serif);
+  font-size: clamp(58px, 7vw, 104px);
+  font-weight: 400;
+  line-height: 0.9;
+}
+
+.book-room-index button {
+  width: fit-content;
+  margin-top: 16px;
+  border: 1px solid var(--ink);
+  padding: 9px 13px;
+  color: var(--paper-light);
+  background: var(--ink);
+}
+
+.book-fragment-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.book-fragment {
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  border: 1px solid rgba(35, 27, 19, 0.26);
+  border-radius: 2px 26px 3px 20px;
+  background:
+    linear-gradient(rgba(35, 27, 19, 0.032) 1px, transparent 1px) 0 0 / 100% 30px,
+    rgba(247, 237, 218, 0.68);
+}
+
+.book-fragment span,
+.book-fragment small {
+  color: var(--rust);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.book-fragment p {
+  font-family: var(--serif);
+  font-size: clamp(24px, 3vw, 44px);
+  line-height: 1.16;
+  letter-spacing: -0.04em;
 }
 
 @media (min-width: 1280px) and (min-aspect-ratio: 16 / 10) {

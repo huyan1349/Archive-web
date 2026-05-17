@@ -64,22 +64,24 @@ function tx<T>(storeName: string, mode: IDBTransactionMode, fn: (store: IDBObjec
   )
 }
 
-function serializeDate<T extends Record<string, unknown>>(obj: T): T {
+function serializeDate<T extends object>(obj: T): T {
   const out = { ...obj }
-  for (const [key, value] of Object.entries(out)) {
+  const record = out as Record<string, unknown>
+  for (const [key, value] of Object.entries(record)) {
     if (value instanceof Date) {
-      (out as Record<string, unknown>)[key] = value.toISOString()
+      record[key] = value.toISOString()
     }
   }
   return out
 }
 
-function deserializeDate<T extends Record<string, unknown>>(obj: T, fields: string[]): T {
+function deserializeDate<T extends object>(obj: T, fields: string[]): T {
   const out = { ...obj }
+  const record = out as Record<string, unknown>
   for (const field of fields) {
-    const value = out[field]
+    const value = record[field]
     if (typeof value === 'string') {
-      (out as Record<string, unknown>)[field] = new Date(value)
+      record[field] = new Date(value)
     }
   }
   return out
