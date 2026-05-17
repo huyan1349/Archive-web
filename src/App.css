@@ -1,7 +1,8 @@
 .archive {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   color: var(--ink);
 }
 
@@ -1276,16 +1277,22 @@
 
 .app-shell {
   display: grid;
-  grid-template-columns: 86px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1px;
   min-height: 100vh;
-  margin: 0;
+  margin: 0 0 0 86px;
   border: 1px solid var(--line);
   background: var(--line);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 28px 80px rgba(73, 45, 18, 0.16);
-  animation: page-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: shell-fade 420ms ease both;
+  transition: margin-left 520ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-shell:has(.app-sidebar:hover),
+.app-shell:has(.app-sidebar:focus-within) {
+  margin-left: 284px;
 }
 
 .app-sidebar,
@@ -1298,27 +1305,54 @@
 }
 
 .app-sidebar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   z-index: 40;
   align-self: start;
   display: grid;
   grid-template-rows: auto 1fr auto auto;
   gap: 18px;
   width: 86px;
-  height: 100vh;
+  height: 100dvh;
   padding: 18px 10px;
   border: 1px solid var(--line);
   overflow: hidden;
+  box-shadow:
+    8px 0 0 rgba(35, 27, 19, 0.06),
+    0 24px 60px rgba(73, 45, 18, 0.12);
+  transition:
+    width 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    padding 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 320ms ease;
+}
+
+.app-sidebar:hover,
+.app-sidebar:focus-within {
+  width: 284px;
+  padding: 22px 18px;
+  box-shadow:
+    12px 0 0 rgba(35, 27, 19, 0.06),
+    0 30px 80px rgba(73, 45, 18, 0.16);
 }
 
 .app-sidebar .brand {
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .app-sidebar .brand-word {
-  display: none;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity 260ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-sidebar:hover .brand-word,
+.app-sidebar:focus-within .brand-word {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .app-nav {
@@ -1329,15 +1363,15 @@
 
 .app-nav .nav-tab {
   display: grid;
-  grid-template-columns: 1fr;
-  justify-items: center;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  justify-items: stretch;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
   width: 100%;
   border: 1px solid transparent;
-  padding: 10px 4px;
+  padding: 12px 10px;
   color: var(--soft-ink);
-  text-align: center;
+  text-align: left;
 }
 
 .page-icon {
@@ -1410,11 +1444,32 @@
 
 .app-nav .nav-tab span {
   overflow: hidden;
-  max-width: 64px;
+  max-width: 160px;
   font-size: 11px;
   letter-spacing: 0.08em;
+  opacity: 0;
+  transform: translateX(-8px);
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition:
+    opacity 260ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-nav .nav-tab small {
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity 260ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-sidebar:hover .app-nav .nav-tab span,
+.app-sidebar:focus-within .app-nav .nav-tab span,
+.app-sidebar:hover .app-nav .nav-tab small,
+.app-sidebar:focus-within .app-nav .nav-tab small {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .app-nav .nav-tab.active {
@@ -1431,6 +1486,17 @@
 .side-actions {
   display: grid;
   gap: 8px;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity 260ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-sidebar:hover .side-actions,
+.app-sidebar:focus-within .side-actions {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .side-actions button {
@@ -1440,8 +1506,8 @@
   padding: 8px 6px;
   color: var(--paper-light);
   background: var(--ink);
-  text-align: center;
-  font-size: 11px;
+  text-align: left;
+  font-size: 13px;
   line-height: 1.15;
   transition:
     transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -1470,18 +1536,28 @@
   overflow: hidden;
   color: var(--muted);
   font-family: var(--serif);
-  font-size: 12px;
+  font-size: 15px;
   font-style: italic;
-  line-height: 1.25;
-  writing-mode: vertical-rl;
-  max-height: 120px;
+  line-height: 1.35;
+  max-height: none;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity 260ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-sidebar:hover .import-status,
+.app-sidebar:focus-within .import-status {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .app-workspace {
   position: relative;
   min-height: 100vh;
   padding: clamp(20px, 2.8vw, 40px) clamp(22px, 3vw, 46px);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .app-workspace::before {
@@ -1892,6 +1968,15 @@
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0);
+  }
+}
+
+@keyframes shell-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
