@@ -86,6 +86,19 @@ const copy = {
     version: '版本',
     versionNum: 'Phase 1 — MVP',
     tagline: 'A Quiet Place for Your Reading Life.',
+    introStep2Label: '你的阅读房间',
+    introStep2Title: '四间纸上的房间，收纳你的阅读人生。',
+    introStep2Desc1: '书房 · 今日档案台，瞥见最近归来的碎片。',
+    introStep2Desc2: '碎片 · 像撕下的纸条，被夹回旧书页之间。',
+    introStep2Desc3: '时间线 · 你的阅读按照季节排列，而非数字。',
+    introStep2Desc4: '藏书 · 每一本书，都会形成一个房间。',
+    introStep3Label: '如何开始',
+    introStep3Title: '导入你的 Kindle 笔记，安静地归档。',
+    introStep3Desc1: '将 Kindle 的 My Clippings.txt 拖入书房。',
+    introStep3Desc2: 'Archive 自动解析每一段划线、笔记与书签。',
+    introStep3Desc3: '这间书房会记住所有的日期与书页。',
+    introStep3Desc4: '数据只留在你自己的设备上，不上传任何内容。',
+    replayIntro: '重新播放开场',
   },
   en: {
     navRoom: 'The Room',
@@ -158,6 +171,19 @@ const copy = {
     version: 'Version',
     versionNum: 'Phase 1 — MVP',
     tagline: 'A Quiet Place for Your Reading Life.',
+    introStep2Label: 'Your Reading Rooms',
+    introStep2Title: 'Four paper rooms to hold your reading life.',
+    introStep2Desc1: 'The Room · A desk to glimpse your latest fragments.',
+    introStep2Desc2: 'Fragments · Like torn paper slips between old pages.',
+    introStep2Desc3: 'Timeline · Your reading, arranged by season, not numbers.',
+    introStep2Desc4: 'Library · Every book becomes its own room.',
+    introStep3Label: 'How to Start',
+    introStep3Title: 'Import your Kindle notes. Quietly archive.',
+    introStep3Desc1: 'Drop your Kindle My Clippings.txt into the room.',
+    introStep3Desc2: 'Archive parses every highlight, note, and bookmark.',
+    introStep3Desc3: 'This room remembers every date and every page.',
+    introStep3Desc4: 'Your data stays on your device. Nothing is uploaded.',
+    replayIntro: 'Replay intro',
   },
 }
 
@@ -195,6 +221,7 @@ function App() {
   const [lang, setLang] = useState<Lang>('zh')
   const [page, setPage] = useState<Page>('room')
   const [showIntro, setShowIntro] = useState(() => localStorage.getItem('archive:intro-seen') !== '1')
+  const [introPage, setIntroPage] = useState(0)
   const [books, setBooks] = useState<Book[]>([])
   const [archiveFragments, setArchiveFragments] = useState<Fragment[]>([])
   const [imports, setImports] = useState<ImportRecord[]>([])
@@ -337,6 +364,11 @@ function App() {
     setShowIntro(false)
   }
 
+  function replayIntro() {
+    setIntroPage(0)
+    setShowIntro(true)
+  }
+
   async function handleClearData() {
     const dbs = await indexedDB.databases()
     for (const dbInfo of dbs) {
@@ -457,38 +489,174 @@ function App() {
       <div className="paper-noise" />
       {showIntro && (
         <section className="intro-screen" aria-label="Archive introduction">
-          <div className="intro-rule top-rule" />
-          <div className="intro-hero">
-            <div>
-              <p className="eyebrow">{t.eyebrow}</p>
-              <h1>{t.heroTitle}</h1>
-              <p className="intro">{t.intro}</p>
-              <div className="intro-actions">
-                <button type="button" onClick={enterArchive}>
-                  {lang === 'zh' ? '进入档案' : 'Enter archive'}
-                </button>
-                <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
-                  {lang === 'zh' ? 'English' : '中文'}
-                </button>
-              </div>
-            </div>
+          {introPage === 0 && (
+            <>
+              <div className="intro-rule top-rule" />
+              <div className="intro-hero">
+                <div>
+                  <p className="eyebrow">{t.eyebrow}</p>
+                  <h1>{t.heroTitle}</h1>
+                  <p className="intro">{t.intro}</p>
+                  <div className="intro-actions">
+                    <button type="button" onClick={() => setIntroPage(1)}>
+                      {lang === 'zh' ? '了解更多' : 'Learn more'}
+                    </button>
+                    <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
+                      {lang === 'zh' ? 'English' : '中文'}
+                    </button>
+                  </div>
+                </div>
 
-            <article className="room-card intro-card" aria-label="Opening fragment">
-              <div className="ink-figure" />
-              <p className="card-kicker">{t.cardKicker}</p>
-              <blockquote>{featuredFragment?.content || t.emptyQuote}</blockquote>
-              <div className="card-footer">
-                <span>{stats.fragments} {t.returned}</span>
-                <span>{featuredFragment ? formatDate(featuredFragment.clippedAt, lang) : '00:17'}</span>
+                <article className="room-card intro-card" aria-label="Opening fragment">
+                  <div className="ink-figure" />
+                  <p className="card-kicker">{t.cardKicker}</p>
+                  <blockquote>{featuredFragment?.content || t.emptyQuote}</blockquote>
+                  <div className="card-footer">
+                    <span>{stats.fragments} {t.returned}</span>
+                    <span>{featuredFragment ? formatDate(featuredFragment.clippedAt, lang) : '00:17'}</span>
+                  </div>
+                </article>
               </div>
-            </article>
+              <div className="poster-caption intro-caption">
+                <span>{t.captionOne}</span>
+                <span>{t.captionTwo}</span>
+                <span>{t.captionThree}</span>
+              </div>
+              <div className="intro-rule bottom-rule" />
+            </>
+          )}
+
+          {introPage === 1 && (
+            <>
+              <div className="intro-rule top-rule" />
+              <div className="intro-hero intro-hero-rooms">
+                <div>
+                  <p className="eyebrow">{t.introStep2Label}</p>
+                  <h1>{t.introStep2Title}</h1>
+                  <div className="intro-rooms-grid">
+                    <div className="intro-room-cell">
+                      <span className="ir-icon" aria-hidden="true">📖</span>
+                      <strong>{t.navRoom}</strong>
+                      <p>{t.introStep2Desc1}</p>
+                    </div>
+                    <div className="intro-room-cell">
+                      <span className="ir-icon" aria-hidden="true">📜</span>
+                      <strong>{t.navFragments}</strong>
+                      <p>{t.introStep2Desc2}</p>
+                    </div>
+                    <div className="intro-room-cell">
+                      <span className="ir-icon" aria-hidden="true">⌛</span>
+                      <strong>{t.navTimeline}</strong>
+                      <p>{t.introStep2Desc3}</p>
+                    </div>
+                    <div className="intro-room-cell">
+                      <span className="ir-icon" aria-hidden="true">📚</span>
+                      <strong>{t.navLibrary}</strong>
+                      <p>{t.introStep2Desc4}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="intro-ornament-rooms" aria-hidden="true">
+                  <svg viewBox="0 0 260 340" className="intro-rooms-drawing">
+                    <rect x="40" y="20" width="52" height="200" rx="3" fill="none" stroke="rgba(35,27,19,0.16)" strokeWidth="1.5" transform="rotate(-6, 66, 120)" />
+                    <rect x="100" y="30" width="48" height="180" rx="3" fill="none" stroke="rgba(159,79,45,0.14)" strokeWidth="1.5" transform="rotate(4, 124, 120)" />
+                    <rect x="156" y="14" width="56" height="212" rx="3" fill="none" stroke="rgba(35,27,19,0.18)" strokeWidth="1.5" transform="rotate(-3, 184, 120)" />
+                    <line x1="60" y1="90" x2="60" y2="130" stroke="rgba(35,27,19,0.08)" strokeWidth="6" />
+                    <line x1="124" y1="60" x2="124" y2="100" stroke="rgba(35,27,19,0.06)" strokeWidth="5" />
+                    <line x1="184" y1="80" x2="184" y2="140" stroke="rgba(35,27,19,0.09)" strokeWidth="7" />
+                    <circle cx="66" cy="260" r="4" fill="rgba(159,79,45,0.2)" />
+                    <circle cx="124" cy="280" r="5" fill="rgba(159,79,45,0.16)" />
+                    <circle cx="184" cy="250" r="3.5" fill="rgba(159,79,45,0.22)" />
+                    <path d="M 40 300 C 80 270, 140 310, 180 290" fill="none" stroke="rgba(35,27,19,0.1)" strokeWidth="1" strokeDasharray="4 4" />
+                  </svg>
+                </div>
+              </div>
+              <div className="poster-caption intro-caption">
+                <span>{t.captionOne}</span>
+                <span>{t.captionTwo}</span>
+                <span>{t.captionThree}</span>
+              </div>
+              <div className="intro-rule bottom-rule" />
+            </>
+          )}
+
+          {introPage === 2 && (
+            <>
+              <div className="intro-rule top-rule" />
+              <div className="intro-hero intro-hero-start">
+                <div>
+                  <p className="eyebrow">{t.introStep3Label}</p>
+                  <h1>{t.introStep3Title}</h1>
+                  <div className="intro-start-steps">
+                    <div className="intro-start-step">
+                      <span className="iss-number" aria-hidden="true">1</span>
+                      <p>{t.introStep3Desc1}</p>
+                    </div>
+                    <div className="intro-start-step">
+                      <span className="iss-number" aria-hidden="true">2</span>
+                      <p>{t.introStep3Desc2}</p>
+                    </div>
+                    <div className="intro-start-step">
+                      <span className="iss-number" aria-hidden="true">3</span>
+                      <p>{t.introStep3Desc3}</p>
+                    </div>
+                    <div className="intro-start-step">
+                      <span className="iss-number" aria-hidden="true">4</span>
+                      <p>{t.introStep3Desc4}</p>
+                    </div>
+                  </div>
+                  <div className="intro-actions">
+                    <button type="button" onClick={enterArchive}>
+                      {lang === 'zh' ? '进入档案' : 'Enter archive'}
+                    </button>
+                  </div>
+                </div>
+                <div className="intro-ornament-start" aria-hidden="true">
+                  <svg viewBox="0 0 240 300" className="intro-start-drawing">
+                    <rect x="30" y="40" width="180" height="140" rx="4" fill="none" stroke="rgba(35,27,19,0.18)" strokeWidth="1.5" strokeDasharray="6 3" />
+                    <line x1="60" y1="60" x2="60" y2="110" stroke="rgba(35,27,19,0.1)" strokeWidth="8" />
+                    <line x1="100" y1="60" x2="100" y2="90" stroke="rgba(159,79,45,0.12)" strokeWidth="6" />
+                    <line x1="140" y1="60" x2="140" y2="120" stroke="rgba(35,27,19,0.08)" strokeWidth="7" />
+                    <line x1="176" y1="60" x2="176" y2="100" stroke="rgba(159,79,45,0.1)" strokeWidth="5" />
+                    <path d="M 40 200 C 80 210, 120 180, 160 200 C 180 210, 200 190, 210 210" fill="none" stroke="rgba(35,27,19,0.12)" strokeWidth="1.5" />
+                    <circle cx="60" cy="230" r="5" fill="rgba(159,79,45,0.18)" />
+                    <circle cx="120" cy="245" r="3.5" fill="rgba(35,27,19,0.14)" />
+                    <circle cx="180" cy="228" r="4.5" fill="rgba(159,79,45,0.16)" />
+                  </svg>
+                </div>
+              </div>
+              <div className="poster-caption intro-caption">
+                <span>{t.captionOne}</span>
+                <span>{t.captionTwo}</span>
+                <span>{t.captionThree}</span>
+              </div>
+              <div className="intro-rule bottom-rule" />
+            </>
+          )}
+
+          <div className="intro-dots" role="tablist" aria-label={lang === 'zh' ? '开屏导航' : 'Intro navigation'}>
+            <button
+              type="button"
+              role="tab"
+              className={introPage === 0 ? 'intro-dot active' : 'intro-dot'}
+              onClick={() => setIntroPage(0)}
+              aria-label={lang === 'zh' ? '第1页' : 'Page 1'}
+            />
+            <button
+              type="button"
+              role="tab"
+              className={introPage === 1 ? 'intro-dot active' : 'intro-dot'}
+              onClick={() => setIntroPage(1)}
+              aria-label={lang === 'zh' ? '第2页' : 'Page 2'}
+            />
+            <button
+              type="button"
+              role="tab"
+              className={introPage === 2 ? 'intro-dot active' : 'intro-dot'}
+              onClick={() => setIntroPage(2)}
+              aria-label={lang === 'zh' ? '第3页' : 'Page 3'}
+            />
           </div>
-          <div className="poster-caption intro-caption">
-            <span>{t.captionOne}</span>
-            <span>{t.captionTwo}</span>
-            <span>{t.captionThree}</span>
-        </div>
-          <div className="intro-rule bottom-rule" />
         </section>
       )}
       <div className="app-shell">
@@ -992,6 +1160,12 @@ function App() {
                           {t.enOption}
                         </button>
                       </div>
+                    </div>
+                    <div className="settings-toggle-row">
+                      <span>{t.replayIntro}</span>
+                      <button type="button" className="export-btn" onClick={replayIntro}>
+                        {lang === 'zh' ? '播放' : 'Play'}
+                      </button>
                     </div>
                     <div className="settings-toggle-row muted">
                       <span>{t.themeSection}</span>

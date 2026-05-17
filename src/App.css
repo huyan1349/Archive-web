@@ -169,6 +169,153 @@
   bottom: 48px;
 }
 
+.intro-dots {
+  position: absolute;
+  z-index: 2;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+}
+
+.intro-dot {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid rgba(35, 27, 19, 0.3);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color 280ms ease,
+    border-color 280ms ease,
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.intro-dot.active {
+  background: var(--rust);
+  border-color: var(--rust);
+  transform: scale(1.3);
+}
+
+.intro-dot:hover {
+  border-color: var(--rust);
+  transform: scale(1.2);
+}
+
+.intro-dot.active:hover {
+  transform: scale(1.3);
+}
+
+.intro-rooms-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.intro-room-cell {
+  padding: 18px;
+  border: 1px solid rgba(35, 27, 19, 0.14);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  transition:
+    border-color 320ms ease,
+    background-color 320ms ease,
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.intro-room-cell:hover {
+  border-color: rgba(159, 79, 45, 0.28);
+  background: rgba(255, 255, 255, 0.32);
+  transform: translateY(-2px);
+}
+
+.ir-icon {
+  display: block;
+  font-size: 24px;
+  margin-bottom: 6px;
+  opacity: 0.7;
+}
+
+.intro-room-cell strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 16px;
+  letter-spacing: -0.03em;
+  color: var(--rust);
+  margin-bottom: 4px;
+}
+
+.intro-room-cell p {
+  font-size: 13px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--soft-ink);
+}
+
+.intro-ornament-rooms {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro-rooms-drawing {
+  width: clamp(180px, 22vw, 260px);
+  height: auto;
+  opacity: 0.7;
+  animation: ink-draw 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.intro-ornament-start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro-start-drawing {
+  width: clamp(160px, 20vw, 240px);
+  height: auto;
+  opacity: 0.7;
+  animation: ink-draw 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.intro-start-steps {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.intro-start-step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 14px;
+  align-items: baseline;
+}
+
+.iss-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--rust);
+  border-radius: 999px;
+  color: var(--rust);
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.intro-start-step p {
+  font-size: clamp(14px, 1vw, 17px);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--soft-ink);
+}
+
 .poster {
   position: relative;
   min-height: 100vh;
