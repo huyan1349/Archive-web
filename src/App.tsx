@@ -616,31 +616,50 @@ function App() {
           </section>
 
           {page === 'room' && (
-            <section className="desk-grid">
-              <article className="today-card">
-                <span>{lang === 'zh' ? '今日状态' : 'Today'}</span>
-                <h2>{lang === 'zh' ? '阅读痕迹正在归档。' : 'Reading traces are being filed.'}</h2>
-                <p>{latestImport ? `${t.latestImport}: ${formatDate(latestImport.importedAt, lang)} / ${latestImport.importedCount} ${t.fragments}` : t.emptyQuote}</p>
+            <section className="room-desk">
+              <article className="ink-statement">
+                <div className="ink-decoration" aria-hidden="true">
+                  <span className="ink-swash" />
+                  <span className="ink-dot-stamp" />
+                </div>
+                <span className="statement-label">{lang === 'zh' ? '今日档案台' : 'Today desk'}</span>
+                <h2 className="statement-text">
+                  {lang === 'zh'
+                    ? '阅读痕迹正在归档。'
+                    : 'Reading traces are being filed.'}
+                </h2>
+                <p className="statement-meta">
+                  {latestImport
+                    ? `${t.latestImport}: ${formatDate(latestImport.importedAt, lang)} · ${latestImport.importedCount} ${t.fragments}`
+                    : lang === 'zh' ? '—— 还没有导入记录，在等待你的 Kindle。' : '— No imports yet. Awaiting your Kindle.'}
+                </p>
               </article>
 
-              <div className="recent-stream">
-                <div className="panel-heading">
-                  <span>{lang === 'zh' ? '最近进入档案' : 'Recent entries'}</span>
-                  <button type="button" onClick={() => changePage('fragments')}>{t.allFragments}</button>
+              <div className="room-journal">
+                <div className="journal-head">
+                  <span className="journal-head-label">{lang === 'zh' ? '最近进入档案' : 'Recent entries'}</span>
+                  <button type="button" onClick={() => changePage('fragments')}>{t.allFragments} →</button>
                 </div>
-                {recentFragments.map((fragment) => {
-                  const book = bookMap.get(fragment.bookId)
-                  return (
-                    <article className="record-row" key={fragment.id}>
-                      <time>{formatDate(fragment.clippedAt, lang)}</time>
-                      <p>{fragment.content || t.noContent}</p>
-                      <small>{book?.title ?? t.source} / {typeLabel(fragment.type, lang)}</small>
-                    </article>
-                  )
-                })}
+                <div className="journal-body">
+                  {recentFragments.map((fragment, index) => {
+                    const book = bookMap.get(fragment.bookId)
+                    return (
+                      <div className="journal-line" key={fragment.id} style={{ '--i': index } as React.CSSProperties}>
+                        <div className="journal-line-mark" aria-hidden="true">
+                          <span className="line-bullet" />
+                        </div>
+                        <div className="journal-line-content">
+                          <time className="line-date">{formatDate(fragment.clippedAt, lang)}</time>
+                          <p className="line-text">{fragment.content || t.noContent}</p>
+                          <span className="line-source">{book?.title ?? t.source} · {typeLabel(fragment.type, lang)}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
 
-              <aside className="focus-stack">
+              <aside className="room-margin">
                 <article className="room-card compact-card" aria-label="Featured reading fragment">
                   <p className="card-kicker">{t.cardKicker}</p>
                   <blockquote>{featuredFragment?.content || t.emptyQuote}</blockquote>
