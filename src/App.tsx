@@ -8,9 +8,13 @@ import {
   createRepositoryAdapter,
   importClippings,
   seedIfNeeded,
+  WeReadClient,
+  syncAllBooks,
+  importWeReadBooks,
   type Book,
   type Fragment,
   type ImportRecord,
+  type WeReadSyncProgress,
 } from './core'
 
 type Lang = 'zh' | 'en'

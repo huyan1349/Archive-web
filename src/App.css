@@ -5116,3 +5116,12 @@
 .auth-user-badge .auth-logout:hover {
   color: var(--rust);
 }
+
+.auth-coming-soon {
+  font-size: 0.8rem;
+  color: var(--faint);
+  text-align: center;
+  padding: 1rem 0.5rem;
+  margin: 0;
+  line-height: 1.6;
+}
