@@ -950,12 +950,12 @@
   justify-content: space-between;
   padding: 28px;
   border: 1px solid rgba(35, 27, 19, 0.34);
-  border-radius: 2px 28px 4px 22px;
+  border-radius: 6px 22px 6px 18px;
   background:
     radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.5), transparent 10rem),
     linear-gradient(rgba(35, 27, 19, 0.035) 1px, transparent 1px) 0 0 / 100% 30px,
     #f2dfb9;
-  box-shadow: 7px 8px 0 rgba(35, 27, 19, 0.1);
+  box-shadow: 4px 4px 0 rgba(35, 27, 19, 0.07);
   transform: none;
   animation: paper-card-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
   transition:
@@ -2604,12 +2604,12 @@
   gap: 18px;
   padding: 28px;
   border: 1px solid var(--line);
-  border-radius: 4px 20px 6px 18px;
+  border-radius: 6px 18px 6px 18px;
   background:
     radial-gradient(circle at 14% 16%, rgba(255, 255, 255, 0.42), transparent 12rem),
     linear-gradient(rgba(35, 27, 19, 0.028) 1px, transparent 1px) 0 0 / 100% 30px,
     rgba(242, 223, 185, 0.7);
-  box-shadow: 4px 5px 0 rgba(35, 27, 19, 0.06);
+  box-shadow: 2px 3px 0 rgba(35, 27, 19, 0.05);
   animation: paper-card-in 620ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
   transition:
     transform 420ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -2632,9 +2632,9 @@
 .settings-card:hover {
   border-color: rgba(159, 79, 45, 0.38);
   box-shadow:
-    7px 8px 0 rgba(35, 27, 19, 0.07),
-    0 16px 40px rgba(73, 45, 18, 0.1);
-  transform: translateY(-3px);
+    4px 4px 0 rgba(35, 27, 19, 0.06),
+    0 12px 32px rgba(73, 45, 18, 0.08);
+  transform: translateY(-2px);
 }
 
 .settings-section-label {
@@ -2764,9 +2764,9 @@
   display: flex;
   gap: 0;
   border: 1px solid var(--line);
-  border-radius: 4px 16px 4px 14px;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 3px 4px 0 rgba(35, 27, 19, 0.06);
+  box-shadow: 2px 2px 0 rgba(35, 27, 19, 0.05);
 }
 
 .toggle-options button {
@@ -2803,7 +2803,7 @@
 .export-btn,
 .file-import-label {
   border: 1px solid var(--ink);
-  border-radius: 3px 16px 4px 14px;
+  border-radius: 6px 18px 6px 18px;
   padding: 10px 18px;
   color: var(--paper-light);
   background: var(--ink);
@@ -2817,13 +2817,13 @@
 
 .export-btn:hover,
 .file-import-label:hover {
-  box-shadow: 4px 4px 0 rgba(159, 79, 45, 0.28);
-  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0 rgba(159, 79, 45, 0.28);
+  transform: translate(-1px, -1px);
 }
 
 .clear-btn {
   border: 1px solid rgba(159, 79, 45, 0.42);
-  border-radius: 3px 16px 4px 14px;
+  border-radius: 6px 18px 6px 18px;
   padding: 10px 18px;
   color: var(--rust);
   background: transparent;
@@ -2840,8 +2840,8 @@
 .clear-btn:hover {
   color: var(--paper-light);
   background: rgba(159, 79, 45, 0.88);
-  box-shadow: 4px 4px 0 rgba(159, 79, 45, 0.18);
-  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0 rgba(159, 79, 45, 0.18);
+  transform: translate(-1px, -1px);
 }
 
 .danger-row {
@@ -2904,7 +2904,7 @@
   width: 90%;
   padding: 34px 38px;
   border: 1px solid rgba(35, 27, 19, 0.34);
-  border-radius: 4px 32px 6px 28px;
+  border-radius: 8px 22px 8px 22px;
   background:
     linear-gradient(90deg, rgba(35, 27, 19, 0.035) 1px, transparent 1px) 0 0 / 42px 100%,
     linear-gradient(rgba(35, 27, 19, 0.028) 1px, transparent 1px) 0 0 / 100% 32px,
@@ -2941,7 +2941,7 @@
 
 .confirm-no {
   border: 1px solid var(--line);
-  border-radius: 3px 16px 4px 14px;
+  border-radius: 6px 18px 6px 18px;
   padding: 10px 20px;
   color: var(--soft-ink);
   background: transparent;
