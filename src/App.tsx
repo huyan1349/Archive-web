@@ -189,11 +189,6 @@ function App() {
 
   const topBooks = bookSummaries.slice(0, 3)
   const latestNote = sortedFragments.find((fragment) => fragment.type === 'note' && fragment.content) ?? readableFragments[1]
-  const archiveIssue =
-    lang === 'zh'
-      ? `${formatMonth(sortedFragments.at(-1)?.clippedAt ?? null, lang)} - ${formatMonth(sortedFragments[0]?.clippedAt ?? null, lang)}`
-      : `${formatMonth(sortedFragments.at(-1)?.clippedAt ?? null, lang)} - ${formatMonth(sortedFragments[0]?.clippedAt ?? null, lang)}`
-
   async function loadArchive(options?: { seed?: boolean }) {
     const db = await createDatabase()
     if (options?.seed) {
@@ -272,7 +267,16 @@ function App() {
       <div className="paper-noise" />
       <header className="archive-topbar">
         <div className="brand">
-          <span className="brand-mark">A</span>
+          <span className="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="img">
+              <path className="mark-shadow" d="M15 10.8 34.8 8.7c2.1-.2 3.9 1.4 3.9 3.5v24.2c0 2-1.5 3.6-3.5 3.8L15.4 42c-2.2.2-4.1-1.5-4.1-3.7V14.6c0-2 1.6-3.6 3.7-3.8Z" />
+              <path className="mark-page" d="M12.9 8.2 33 10.1c1.8.2 3.1 1.7 3.1 3.5v24.2c0 2.1-1.8 3.7-3.9 3.5l-20.1-2c-1.8-.2-3.1-1.7-3.1-3.5V11.7c0-2.1 1.8-3.7 3.9-3.5Z" />
+              <path className="mark-line" d="M16 18.2c4.8-1.4 9.6-1.1 14.4.8" />
+              <path className="mark-line faint" d="M16 25c4.3-1.1 8.8-1 13.5.4" />
+              <path className="mark-flame" d="M24.1 31.8c3.3-3.5 4.2-7 1.8-10.6-4 2.4-5.7 5.6-4.9 9.6.3 1.7 1.9 2.3 3.1 1Z" />
+              <circle className="mark-seal" cx="34.8" cy="34.5" r="4.3" />
+            </svg>
+          </span>
           <span>Archive</span>
         </div>
         <nav className="nav-links" aria-label="Primary navigation">
@@ -307,10 +311,6 @@ function App() {
         <div className="poster-rule top-rule" />
         <div className="hero-grid" id="room">
           <div className="hero-copy">
-            <div className="archive-issue">
-              <span>Archive Issue 01</span>
-              <span>{archiveIssue}</span>
-            </div>
             <p className="eyebrow">{t.eyebrow}</p>
             <h1>
               {t.heroTitle}
