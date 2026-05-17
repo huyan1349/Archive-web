@@ -276,7 +276,7 @@ function byRecent(a: Fragment, b: Fragment): number {
 function App() {
   const [lang, setLang] = useState<Lang>('zh')
   const [page, setPage] = useState<Page>('room')
-  const [showIntro, setShowIntro] = useState(() => localStorage.getItem('archive:intro-seen') !== '1')
+  const [showIntro, setShowIntro] = useState(true)
   const [introPage, setIntroPage] = useState(0)
 
   useEffect(() => {
