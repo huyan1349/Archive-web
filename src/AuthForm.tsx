@@ -6,7 +6,6 @@ export default function AuthForm({ lang = 'zh' }: { lang?: 'zh' | 'en' }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
 
   const labels = {
     username: { zh: '用户名', en: 'Username' },
@@ -16,20 +15,13 @@ export default function AuthForm({ lang = 'zh' }: { lang?: 'zh' | 'en' }) {
     passwordPlaceholder: { zh: '密码', en: 'Password' },
   }
 
-  async function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
-    setSubmitting(true)
 
-    try {
-      const result = login(username, password)
-      if (!result.success) {
-        setError(result.error?.message ?? (lang === 'zh' ? '登录失败' : 'Login failed'))
-      }
-    } catch {
-      setError(lang === 'zh' ? '网络错误，请稍后重试' : 'Network error, please try again')
-    } finally {
-      setSubmitting(false)
+    const result = login(username, password)
+    if (!result.success) {
+      setError(result.error?.message ?? (lang === 'zh' ? '登录失败' : 'Login failed'))
     }
   }
 
@@ -64,10 +56,8 @@ export default function AuthForm({ lang = 'zh' }: { lang?: 'zh' | 'en' }) {
 
         {error && <p className="auth-error">{error}</p>}
 
-        <button type="submit" className="auth-submit" disabled={submitting}>
-          {submitting
-            ? (lang === 'zh' ? '处理中...' : 'Processing...')
-            : labels.submit[lang]}
+        <button type="submit" className="auth-submit">
+          {labels.submit[lang]}
         </button>
       </form>
     </div>

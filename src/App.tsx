@@ -1,7 +1,7 @@
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import DevPanel from './DevPanel'
-import AuthForm from './AuthForm'
+import LoginPage from './LoginPage'
 import { useAuth } from './AuthProvider'
 import {
   createDatabase,
@@ -316,6 +316,7 @@ function App() {
   const [showIntro, setShowIntro] = useState(() => localStorage.getItem('archive:intro-seen') !== '1')
   const [introPage, setIntroPage] = useState(0)
   const { user, logout } = useAuth()
+  const [showLogin, setShowLogin] = useState(false)
 
   useEffect(() => {
     if (showSplash) return
@@ -864,24 +865,14 @@ function App() {
                   </p>
                   <div className="intro-actions">
                     <button type="button" onClick={enterArchive}>{t.enterLabel}</button>
+                    {!user && (
+                      <button type="button" className="secondary-action" onClick={() => setShowLogin(true)}>
+                        {lang === 'zh' ? '登录书房' : 'Sign In'}
+                      </button>
+                    )}
                     <button type="button" className="secondary-action" onClick={() => setLang(nextLang)}>
                       {lang === 'zh' ? 'English' : '中文'}
                     </button>
-                  </div>
-                  <div className="auth-section">
-                    <span className="auth-section-label">
-                      {lang === 'zh' ? '可选 · 登录以同步你的阅读' : 'Optional · Log in to sync your reading'}
-                    </span>
-                    {user ? (
-                      <div className="auth-user-badge">
-                        <span className="auth-email">{user.email}</span>
-                        <button type="button" className="auth-logout" onClick={logout}>
-                          {lang === 'zh' ? '登出' : 'Log out'}
-                        </button>
-                      </div>
-                    ) : (
-                      <AuthForm lang={lang} />
-                    )}
                   </div>
                 </div>
                 <div className="start-demo-stage" aria-hidden="true">
@@ -1412,14 +1403,10 @@ function App() {
                             {lang === 'zh' ? '登出' : 'Log out'}
                           </button>
                         </div>
-                      ) : authConfigured ? (
-                        <AuthForm lang={lang} />
                       ) : (
-                        <p className="auth-coming-soon">
-                          {lang === 'zh'
-                            ? '登录同步功能即将上线。配置 Supabase 后即可使用。'
-                            : 'Login sync coming soon. Configure Supabase to enable.'}
-                        </p>
+                        <button type="button" className="export-btn" onClick={() => setShowLogin(true)}>
+                          {lang === 'zh' ? '登录书房' : 'Sign In'}
+                        </button>
                       )}
                     </div>
                   </article>
@@ -1594,6 +1581,7 @@ function App() {
         </section>
       </div>
       <DevPanel />
+      {showLogin && <LoginPage lang={lang} onClose={() => setShowLogin(false)} />}
     </main>
   )
 }
