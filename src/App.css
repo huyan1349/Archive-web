@@ -4164,6 +4164,26 @@
   line-height: 1.5;
 }
 
+.weread-card .weread-ext-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  padding: 8px 10px;
+  border-radius: 2px 12px 3px 10px;
+  background: rgba(233, 185, 111, 0.08);
+  border: 1px solid rgba(233, 185, 111, 0.2);
+}
+
+.weread-card .weread-ext-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
 .weread-card .weread-open-btn {
   display: inline-block;
   padding: 6px 18px;

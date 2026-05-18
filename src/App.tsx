@@ -354,6 +354,7 @@ function App() {
   const [exportLabel, setExportLabel] = useState('')
   const [importLabel, setImportLabel] = useState('')
   const [wereadCookie, setWereadCookie] = useState('')
+  const [wereadCookieFromExt, setWereadCookieFromExt] = useState<string | null>(null)
   const [wereadStatus, setWereadStatus] = useState<'idle' | 'syncing' | 'done' | 'error'>('idle')
   const [wereadMessage, setWereadMessage] = useState('')
   const [wereadProgress, setWereadProgress] = useState<WeReadSyncProgress | null>(null)
@@ -439,6 +440,16 @@ function App() {
     loadArchive({ seed: true }).catch((error) => {
       setStatus(error instanceof Error ? error.message : 'Failed to load archive')
     })
+  }, [])
+
+  useEffect(() => {
+    function onCookie(e: CustomEvent<{ cookie: string }>) {
+      if (e.detail?.cookie) {
+        setWereadCookieFromExt(e.detail.cookie)
+      }
+    }
+    window.addEventListener('lucerna:weread-cookie', onCookie as EventListener)
+    return () => window.removeEventListener('lucerna:weread-cookie', onCookie as EventListener)
   }, [])
 
   async function handleDemoImport() {
@@ -565,17 +576,18 @@ function App() {
     setTimeout(() => setImportLabel(''), 3000)
   }
 
-  async function handleWeReadSync() {
-    if (!wereadCookie.trim()) {
+  async function handleWeReadSync(cookieFromExt?: string) {
+    const cookie = cookieFromExt ?? (wereadCookieFromExt || wereadCookie.trim())
+    if (!cookie) {
       setWereadStatus('error')
-      setWereadMessage(lang === 'zh' ? '请先粘贴 Cookie' : 'Please paste cookie first')
+      setWereadMessage(lang === 'zh' ? '请先粘贴 Cookie 或使用扩展导入' : 'Please paste cookie or use extension')
       return
     }
     setWereadStatus('syncing')
     setWereadMessage(t.wereadSyncing)
     setWereadProgress(null)
     try {
-      const client = new WeReadClient(wereadCookie.trim())
+      const client = new WeReadClient(cookie)
       const valid = await client.validate()
       if (!valid) {
         setWereadStatus('error')
@@ -583,7 +595,7 @@ function App() {
         return
       }
       const { books: booksData, errors: syncErrors } = await syncAllBooks(
-        wereadCookie.trim(),
+        cookie,
         (progress) => setWereadProgress(progress),
       )
       if (booksData.length === 0) {
@@ -607,8 +619,19 @@ function App() {
     } catch (e) {
       setWereadStatus('error')
       setWereadMessage(e instanceof Error ? e.message : 'Sync failed')
+    } finally {
+      // 通知扩展 content script 清除 storage
+      window.dispatchEvent(new CustomEvent('lucerna:weread-cookie-processed'))
+      setWereadCookieFromExt(null)
+      setWereadCookie('')
     }
   }
+
+  useEffect(() => {
+    if (wereadCookieFromExt) {
+      void handleWeReadSync(wereadCookieFromExt)
+    }
+  }, [wereadCookieFromExt])
 
   const selectedBookFragments = selectedBook
     ? sortedFragments.filter((fragment) => fragment.bookId === selectedBook.id)
@@ -1490,6 +1513,10 @@ function App() {
                 <article className="settings-card weread-card">
                   <span className="settings-section-label">{t.wereadTitle}</span>
                   <p className="weread-desc">{t.wereadDesc}</p>
+                  <div className="weread-ext-hint">
+                    <span className="weread-ext-icon" aria-hidden="true">⚡</span>
+                    <span>{lang === 'zh' ? '安装 LUCERNA 浏览器扩展后可一键导入，无需手动粘贴 Cookie。' : 'Install LUCERNA browser extension for one-click import — no manual cookie needed.'}</span>
+                  </div>
                   <div className="settings-toggle-group">
                     <div className="weread-actions">
                       <a
@@ -1506,7 +1533,7 @@ function App() {
                       className="weread-cookie-input"
                       value={wereadCookie}
                       onChange={(e) => setWereadCookie(e.target.value)}
-                      placeholder={t.wereadCookieLabel}
+                      placeholder={lang === 'zh' ? '或手动粘贴 Cookie' : 'Or paste cookie manually'}
                       rows={2}
                       spellCheck={false}
                     />
@@ -1514,7 +1541,7 @@ function App() {
                       <button
                         type="button"
                         className="weread-sync-btn"
-                        onClick={handleWeReadSync}
+                        onClick={() => void handleWeReadSync()}
                         disabled={wereadStatus === 'syncing'}
                       >
                         {wereadStatus === 'syncing' ? t.wereadSyncing : t.wereadSync}

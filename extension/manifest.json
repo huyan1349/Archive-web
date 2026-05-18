@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "LUCERNA · 微信读书导入",
+  "version": "1.0",
+  "description": "一键将微信读书的划线、笔记同步到 LUCERNA Archive",
+  "permissions": ["cookies", "storage"],
+  "host_permissions": [
+    "https://weread.qq.com/*",
+    "https://i.weread.qq.com/*",
+    "http://localhost:5173/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://localhost:5173/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

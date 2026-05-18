@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { width: 280px; padding: 16px; font-family: Georgia, serif; background: #1a1410; color: #efe1c3; margin: 0; }
+    h3 { margin: 0 0 10px; font-size: 14px; color: #e9b96f; letter-spacing: 0.05em; }
+    p { margin: 6px 0; font-size: 12px; color: #b8a88d; line-height: 1.5; }
+    .status { padding: 8px 10px; border-radius: 6px; font-size: 12px; margin: 8px 0; }
+    .status-ok { background: rgba(100,180,100,0.15); color: #8fd48f; }
+    .status-err { background: rgba(220,80,80,0.15); color: #e87070; }
+    .status-warn { background: rgba(220,180,80,0.15); color: #e9c86f; }
+    button { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(233,185,111,0.4);
+      background: rgba(233,185,111,0.1); color: #e9b96f; font-family: Georgia, serif; font-size: 13px;
+      cursor: pointer; margin-top: 8px; }
+    button:disabled { opacity: 0.4; cursor: default; }
+    button:hover:not(:disabled) { background: rgba(233,185,111,0.2); }
+    .result { margin-top: 8px; font-size: 11px; color: #8a7e6e; word-break: break-word; }
+    a { color: #e9b96f; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <h3>LUCERNA · 微信读书导入</h3>
+  <div id="status"></div>
+  <button id="btn-import" disabled>导入到 LUCERNA</button>
+  <div id="result" class="result"></div>
+  <p style="margin-top:12px;">LUCERNA 需运行于 <a href="http://localhost:5173" target="_blank">localhost:5173</a></p>
+
+  <script src="popup.js"></script>
+</body>
+</html>
