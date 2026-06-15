@@ -3,28 +3,170 @@
 <head>
   <meta charset="UTF-8">
   <style>
-    body { width: 280px; padding: 16px; font-family: Georgia, serif; background: #1a1410; color: #efe1c3; margin: 0; }
-    h3 { margin: 0 0 10px; font-size: 14px; color: #e9b96f; letter-spacing: 0.05em; }
-    p { margin: 6px 0; font-size: 12px; color: #b8a88d; line-height: 1.5; }
-    .status { padding: 8px 10px; border-radius: 6px; font-size: 12px; margin: 8px 0; }
-    .status-ok { background: rgba(100,180,100,0.15); color: #8fd48f; }
-    .status-err { background: rgba(220,80,80,0.15); color: #e87070; }
-    .status-warn { background: rgba(220,180,80,0.15); color: #e9c86f; }
-    button { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(233,185,111,0.4);
-      background: rgba(233,185,111,0.1); color: #e9b96f; font-family: Georgia, serif; font-size: 13px;
-      cursor: pointer; margin-top: 8px; }
-    button:disabled { opacity: 0.4; cursor: default; }
-    button:hover:not(:disabled) { background: rgba(233,185,111,0.2); }
-    .result { margin-top: 8px; font-size: 11px; color: #8a7e6e; word-break: break-word; }
-    a { color: #e9b96f; font-size: 11px; }
+    body {
+      width: 340px;
+      margin: 0;
+      padding: 16px;
+      font-family: Georgia, "Times New Roman", serif;
+      background: #f7edda;
+      color: #231b13;
+      line-height: 1.5;
+    }
+    .brand {
+      font-size: 12px;
+      color: #877764;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 400;
+    }
+    .status {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin: 6px 0;
+      border: 1px solid transparent;
+    }
+    .status-ok { background: rgba(109,114,89,0.12); color: #4a523c; border-color: rgba(109,114,89,0.2); }
+    .status-err { background: rgba(159,79,45,0.1); color: #9f4f2d; border-color: rgba(159,79,45,0.18); }
+    .status-warn { background: rgba(189,122,54,0.1); color: #bd7a36; border-color: rgba(189,122,54,0.2); }
+
+    .cookie-area {
+      margin-top: 8px;
+      display: none;
+    }
+    .cookie-area.visible {
+      display: block;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(49,34,20,0.2);
+      background: rgba(255,255,255,0.6);
+      color: #231b13;
+      font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+      font-size: 11px;
+      line-height: 1.4;
+      resize: none;
+      box-sizing: border-box;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: rgba(109,114,89,0.4);
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    button {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(49,34,20,0.2);
+      background: rgba(255,255,255,0.45);
+      color: #231b13;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover:not(:disabled) {
+      background: rgba(255,255,255,0.7);
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .btn-copy {
+      background: rgba(109,114,89,0.15);
+      border-color: rgba(109,114,89,0.3);
+      font-weight: 500;
+    }
+    .btn-copy:hover:not(:disabled) {
+      background: rgba(109,114,89,0.25);
+    }
+    .btn-copy.copied {
+      background: rgba(109,114,89,0.3);
+      color: #4a523c;
+    }
+    .steps {
+      font-size: 11px;
+      color: #877764;
+      margin: 8px 0;
+      padding: 6px 8px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 4px;
+      line-height: 1.7;
+    }
+    .steps b { color: #5a4a38; }
+    .steps .num { color: #6d7259; font-weight: 600; }
+
+    .test-result-area {
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      border: 1px solid transparent;
+      display: none;
+    }
+    .test-result-area.test-ok {
+      display: block;
+      background: rgba(109,114,89,0.12);
+      color: #4a523c;
+      border-color: rgba(109,114,89,0.2);
+    }
+    .test-result-area.test-err {
+      display: block;
+      background: rgba(159,79,45,0.1);
+      color: #9f4f2d;
+      border-color: rgba(159,79,45,0.18);
+    }
+    .test-result-area.test-pending {
+      display: block;
+      background: rgba(189,122,54,0.1);
+      color: #bd7a36;
+      border-color: rgba(189,122,54,0.2);
+    }
   </style>
 </head>
 <body>
-  <h3>LUCERNA · 微信读书导入</h3>
-  <div id="status"></div>
-  <button id="btn-import" disabled>导入到 LUCERNA</button>
-  <div id="result" class="result"></div>
-  <p style="margin-top:12px;">LUCERNA 需运行于 <a href="http://localhost:5173" target="_blank">localhost:5173</a></p>
+  <div class="brand">LUCERNA</div>
+  <h3>微信读书 · Cookie 助手</h3>
+
+  <div id="status" class="status status-warn">正在检测登录状态...</div>
+
+  <div id="cookie-area" class="cookie-area">
+    <div id="result-msg" style="font-size:11px;color:#877764;margin-bottom:4px;"></div>
+    <textarea id="cookie-text" readonly></textarea>
+    <div class="btn-row">
+      <button id="btn-copy" class="btn-copy">复制 Cookie</button>
+      <button id="btn-refresh">重新读取</button>
+    </div>
+  </div>
+
+  <div id="no-cookie-hint" class="steps" style="display:none;">
+    <b>请先登录微信读书：</b><br>
+    <span class="num">1.</span> 在 Chrome 打开 <b>weread.qq.com</b><br>
+    <span class="num">2.</span> 扫码登录<br>
+    <span class="num">3.</span> 回来点「重新读取」
+  </div>
+
+  <div class="steps">
+    <b>如何导入到 LUCERNA：</b><br>
+    <span class="num">1.</span> 点「复制 Cookie」<br>
+    <span class="num">2.</span> 打开 LUCERNA → 设置 → 微信读书<br>
+    <span class="num">3.</span> 粘贴到 Cookie 输入框 → 点「一键同步」
+  </div>
+
+  <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(49,34,20,0.1);font-size:10px;color:#877764;text-align:center;">
+    © @huyan
+  </div>
 
   <script src="popup.js"></script>
 </body>

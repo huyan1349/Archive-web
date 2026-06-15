@@ -443,13 +443,42 @@ function App() {
   }, [])
 
   useEffect(() => {
+    const w = window as any
+
+    // 兜底：content script 可能已经在 window 上放了 cookie
+    if (w.__wereadCookie && !w.__wereadCookieProcessed) {
+      console.log('[App] 从 window.__wereadCookie 收到 cookie')
+      setWereadCookieFromExt(w.__wereadCookie)
+      w.__wereadCookieProcessed = true
+    }
+
+    // 主通道：CustomEvent（由注入页面的 <script> 触发）
     function onCookie(e: CustomEvent<{ cookie: string }>) {
       if (e.detail?.cookie) {
+        console.log('[App] 从 CustomEvent 收到 cookie，长度:', e.detail.cookie.length)
         setWereadCookieFromExt(e.detail.cookie)
+        w.__wereadCookieProcessed = true
       }
     }
     window.addEventListener('lucerna:weread-cookie', onCookie as EventListener)
-    return () => window.removeEventListener('lucerna:weread-cookie', onCookie as EventListener)
+
+    // 兜底通道：postMessage（content script 隔离世界备用方案）
+    function onMessage(e: MessageEvent) {
+      if (e.data?.type === 'lucerna:weread-cookie' && e.data?.cookie) {
+        console.log('[App] 从 postMessage 收到 cookie，长度:', e.data.cookie.length)
+        setWereadCookieFromExt(e.data.cookie)
+        w.__wereadCookieProcessed = true
+      }
+    }
+    window.addEventListener('message', onMessage)
+
+    // 通知 content script：React 已就绪
+    window.dispatchEvent(new CustomEvent('lucerna:ready'))
+
+    return () => {
+      window.removeEventListener('lucerna:weread-cookie', onCookie as EventListener)
+      window.removeEventListener('message', onMessage)
+    }
   }, [])
 
   async function handleDemoImport() {
@@ -577,7 +606,8 @@ function App() {
   }
 
   async function handleWeReadSync(cookieFromExt?: string) {
-    const cookie = cookieFromExt ?? (wereadCookieFromExt || wereadCookie.trim())
+    const cookie = cookieFromExt ?? wereadCookie.trim()
+    console.log('[App] handleWeReadSync 被调用，cookie 来源:', cookieFromExt ? 'extension' : 'manual', '，长度:', cookie.length)
     if (!cookie) {
       setWereadStatus('error')
       setWereadMessage(lang === 'zh' ? '请先粘贴 Cookie 或使用扩展导入' : 'Please paste cookie or use extension')
@@ -588,10 +618,11 @@ function App() {
     setWereadProgress(null)
     try {
       const client = new WeReadClient(cookie)
-      const valid = await client.validate()
+      const { valid, error } = await client.validate()
       if (!valid) {
         setWereadStatus('error')
-        setWereadMessage(t.wereadInvalid)
+        setWereadMessage(t.wereadInvalid + (error ? ' (' + error + ')' : ''))
+        console.log('[App] Cookie 验证失败:', error)
         return
       }
       const { books: booksData, errors: syncErrors } = await syncAllBooks(
@@ -629,6 +660,7 @@ function App() {
 
   useEffect(() => {
     if (wereadCookieFromExt) {
+      console.log('[App] wereadCookieFromExt 变化，触发同步，cookie 长度:', wereadCookieFromExt.length)
       void handleWeReadSync(wereadCookieFromExt)
     }
   }, [wereadCookieFromExt])
@@ -1609,6 +1641,18 @@ function App() {
       </div>
       <DevPanel />
       {showLogin && <LoginPage lang={lang} onClose={() => setShowLogin(false)} />}
+
+      {/* 🖋 @huyan */}
+      <div style={{
+        textAlign: 'center',
+        padding: '24px 0 12px',
+        fontSize: 11,
+        color: 'rgba(49,34,20,0.25)',
+        letterSpacing: '0.05em',
+        userSelect: 'none',
+      }}>
+        © huyan
+      </div>
     </main>
   )
 }

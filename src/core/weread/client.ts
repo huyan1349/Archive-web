@@ -46,12 +46,17 @@ export class WeReadClient {
     return res.json() as Promise<T>
   }
 
-  async validate(): Promise<boolean> {
+  async validate(): Promise<{ valid: boolean; error?: string }> {
     try {
       const data = await this.request<{ books?: unknown[] }>('/user/notebooks')
-      return Array.isArray(data.books)
-    } catch {
-      return false
+      if (Array.isArray(data.books)) {
+        return { valid: true }
+      }
+      return { valid: false, error: 'API 返回数据格式异常' }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error'
+      console.error('[WeReadClient] validate 失败:', msg)
+      return { valid: false, error: msg }
     }
   }
 

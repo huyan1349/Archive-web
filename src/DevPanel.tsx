@@ -96,13 +96,13 @@ export default function DevPanel() {
     setMessage('')
     try {
       const client = new WeReadClient(wereadCookie.trim())
-      const valid = await client.validate()
+      const { valid, error } = await client.validate()
       if (valid) {
         setStatus('success')
         setMessage('Cookie valid! Ready to sync.')
       } else {
         setStatus('error')
-        setMessage('Cookie invalid or expired. Please re-login to weread.qq.com')
+        setMessage('Cookie invalid or expired. ' + (error || ''))
       }
     } catch (e) {
       setStatus('error')
